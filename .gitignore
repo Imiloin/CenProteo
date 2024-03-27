@@ -1,3 +1,10 @@
+# VSCode
+.vscode/
+*.code-workspace
+
+# TEMP
+temp/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
