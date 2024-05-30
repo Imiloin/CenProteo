@@ -1,5 +1,6 @@
 import pandas as pd
 import networkx as nx
+import argparse
 
 """
 The JDC method is based on the PPI network data and gene expression data. 
@@ -11,7 +12,7 @@ Zhong J, Tang C, Peng W, et al. A novel essential protein identification method 
 """
 
 class JDC:
-    def __init__(self, ppi_file, gene_expression_file):
+    def __init__(self, method, ppi_file, gene_expression_file, n, saved_file_path = None, **kargs):
         # Load PPI network data
         self.ppi_file = ppi_file
         try:
@@ -34,7 +35,10 @@ class JDC:
         self.gene_expression_dict = self.binariztion_gene_expression(data2)
         self.ecc = None
         self.jaccard = None
-    
+        self.n = n
+        self.saved_file_path = saved_file_path
+        self.method = method
+
     def edge_clustering_coefficient(self):
         if self.ecc is not None:
             return self.ecc
@@ -87,7 +91,7 @@ class JDC:
         self.jaccard = jaccard
         return jaccard
 
-    def calculate_jdc(self, n):
+    def calculate_jdc(self):
         self.edge_clustering_coefficient()
         self.Jaccard_similarity_index()
 
@@ -103,10 +107,11 @@ class JDC:
                     continue
 
             jdc_dict[node] = jdc_value
-        sorted_jdc = sorted(jdc_dict.items(), key=lambda x: x[1], reverse=True)[:n]
+        sorted_jdc = sorted(jdc_dict.items(), key=lambda x: x[1], reverse=True)[:self.n]
+        self.sorted_jdc = sorted_jdc
         return sorted_jdc
     
-    def export_result_to_csv(self, result, file_name):
+    def export_result_to_csv(self):
         """
         Export the result data to a CSV file.
         
@@ -114,10 +119,34 @@ class JDC:
         result (list of tuples): The result data to be exported, typically the output of a centrality calculation.
         file_name (str): Name of the file to save the results to.
         """
-        result_df = pd.DataFrame(result, columns=['Protein', 'JDC Centrality Score'])
-        result_df.to_csv(file_name, index=False)
+        if self.saved_file_path == None:
+            raise ValueError("saved_file_path can't be None")
+        result_df = pd.DataFrame(self.sorted_jdc, columns=['Protein', 'JDC Centrality Score'])
+        result_df.to_csv(self.saved_file_path, index=False)
+
+    def start(self):
+        if self.method == "calculate_jdc":
+            self.calculate_jdc()
+        if self.method == "export_result_to_csv":
+            self.export_result_to_csv()
+        
+
 
 # Example usage
-#jdc_instance = JDC('/Users/xiaoyao/Documents/ppi/data/DIP_data_with_combined_scores.csv', '/Users/xiaoyao/Documents/ppi/filtered_GE_matrix.csv')
-#top_nodes = jdc_instance.calculate_jdc(100)
+#jdc_instance = JDC('/Users/xiaoyao/Documents/ppi/data/DIP_data_with_combined_scores.csv', '/Users/xiaoyao/Documents/ppi/filtered_GE_matrix.csv', 100)
+#top_nodes = jdc_instance.calculate_jdc
 
+def parse_command_line_args():
+    parser = argparse.ArgumentParser(description='JDC Algorithm')
+    parser.add_argument("--method", required=True, type=str, help="please select the method")
+    parser.add_argument('-ppi', '--ppi_file', required=True, type=str,help='protein protein network file path for algorithm JDC')
+    parser.add_argument('-ge', '--gene_expression_file',  required=True, type=str, help='gene exprrssion file path for algorithm JDC')
+    parser.add_argument('-n', '--n', type=int, required=True, help='the number of essential proteins output')
+    parser.add_argument('-s', '--saved_file_path', type=str, default=None, help='the file path to save the result')
+    return parser.parse_args()
+
+
+if __name__ == '__main__':
+    args = parse_command_line_args()
+    jdc = JDC(**vars(args))
+    jdc.start()
