@@ -12,10 +12,11 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=find_packages(),
-    test_suite="tests",
     python_requires='>=3.8',
     install_requires=[
         "pytest",
+        "networkx",
+        "pandas",
     ],
     classifiers=[
         "Development Status :: 3 - Alpha",
