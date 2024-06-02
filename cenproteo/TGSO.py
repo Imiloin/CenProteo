@@ -294,8 +294,8 @@ class TGSO:
         for ess_pro in top_TGSO_score:
             if ess_pro in self.essential_protein_list:
                 count += 1
-        return f"There're {count} essential proteins in the top {n} predicted by TGSO algorism. \nThe iteration has been repeated for {self.iter_time} times."
-
+        print( f"There're {count} essential proteins in the top {n} predicted by TGSO algorism. \nThe iteration has been repeated for {self.iter_time} times.")
+        return count
 
 # ppi_file = r'SC_Data/processed_data/combined_data.csv'
 # gene_expression_file = r'SC_Data/processed_data/filtered_GE_matrix.csv'

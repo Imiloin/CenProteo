@@ -33,7 +33,7 @@ class TEO:
         # the result dict using three kinds of GO term
         self.TEO_BP = self.TEO('BP')
         self.TEO_MF = self.TEO('MF')
-        self.TEO_CC = self.TEO('CC')
+        self.TEO_CC = self.TEO('tCC')
     
     def _get_essential_protein(self, df):
         essential_pro = []
@@ -47,7 +47,7 @@ class TEO:
         Construct a dict according to the GO similarity data,
         in which the GO similarity under BP term can be accessed by 'BP',
         the GO similarity under MF term can be accessed by 'MF',
-        and the GO similarity under CC term can be accessed by 'CC'
+        and the GO similarity under tCC term can be accessed by 'tCC'
         '''
         GO_dict = {}
         for index, row in df.iterrows():
@@ -57,7 +57,7 @@ class TEO:
             GO_dict[index] = {
                 'BP': GO_BP,
                 'MF': GO_MF,
-                'CC': GO_CC,
+                'tCC': GO_CC,
             }
             GO_dict[(index[1], index[0])] = GO_dict[index]
         return GO_dict
@@ -117,14 +117,14 @@ class TEO:
         return abs(pcc)
     
     def GO_similarity(self, u, v, GO_term):
-        if GO_term in ['BP', 'MF', 'CC']:
+        if GO_term in ['BP', 'MF', 'tCC']:
             go = self.GO_similarity_dict[(u, v)][GO_term]
             return go
         return "GO term error"
     
     def TEO(self, GO_term):
         # calculate the final TEO score of each protein in the PPIN
-        if GO_term not in ['BP', 'MF', 'CC']:
+        if GO_term not in ['BP', 'MF', 'tCC']:
             return "GO term error"
         TEO_score = {}
         for protein_a in self.G.nodes():
@@ -147,13 +147,15 @@ class TEO:
             top_TEO_score = list(self.TEO_BP.keys())[:n]
         elif GO_term == 'MF':
             top_TEO_score = list(self.TEO_MF.keys())[:n]
-        elif GO_term == 'CC':
+        elif GO_term == 'tCC':
             top_TEO_score = list(self.TEO_CC.keys())[:n]
         
         for ess_pro in top_TEO_score:
             if ess_pro in self.essential_protein_list:
                 count += 1
-        return f"There're {count} essential proteins in the top {n} predicted by TEO_{GO_term} algorism."
+        print(f"There're {count} essential proteins in the top {n} predicted by TEO_{GO_term} algorism.")
+        return count
+        
     
     def get_score_table(self, GO_term, result_path):
         # get the TEO score result in a csv file
@@ -161,7 +163,7 @@ class TEO:
             score_list = list(self.TEO_BP.items())
         elif GO_term == 'MF':
             score_list = list(self.TEO_MF.items())
-        elif GO_term == 'CC':
+        elif GO_term == 'tCC':
             score_list = list(self.TEO_CC.items())
         
         with open(result_path, mode = 'w', newline = '') as file:

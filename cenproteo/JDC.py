@@ -1,6 +1,5 @@
 import pandas as pd
 import networkx as nx
-import argparse
 
 """
 The JDC method is based on the PPI network data and gene expression data. 
@@ -12,7 +11,7 @@ Zhong J, Tang C, Peng W, et al. A novel essential protein identification method 
 """
 
 class JDC:
-    def __init__(self, method, ppi_file, gene_expression_file, n, saved_file_path = None, **kargs):
+    def __init__(self, ppi_file, gene_expression_file,essential_protein_file):
         # Load PPI network data
         self.ppi_file = ppi_file
         try:
@@ -35,10 +34,18 @@ class JDC:
         self.gene_expression_dict = self.binariztion_gene_expression(data2)
         self.ecc = None
         self.jaccard = None
-        self.n = n
-        self.saved_file_path = saved_file_path
-        self.method = method
 
+        self.essential_protein_file = essential_protein_file
+        df_essential = pd.read_csv(essential_protein_file)
+        self.essential_protein_list = self._get_essential_protein(df_essential)
+
+        self.sorted_score = self.calculate_jdc()
+    def _get_essential_protein(self, df):
+        essential_pro = []
+        for _, row in df.iterrows():
+            pro = row.iloc[1]
+            essential_pro.append(pro)
+        return essential_pro
     def edge_clustering_coefficient(self):
         if self.ecc is not None:
             return self.ecc
@@ -107,11 +114,11 @@ class JDC:
                     continue
 
             jdc_dict[node] = jdc_value
-        sorted_jdc = sorted(jdc_dict.items(), key=lambda x: x[1], reverse=True)[:self.n]
+        sorted_jdc = sorted(jdc_dict.items(), key=lambda x: x[1], reverse=True)
         self.sorted_jdc = sorted_jdc
         return sorted_jdc
     
-    def export_result_to_csv(self):
+    def export_result_to_csv(self,save_path):
         """
         Export the result data to a CSV file.
         
@@ -119,34 +126,31 @@ class JDC:
         result (list of tuples): The result data to be exported, typically the output of a centrality calculation.
         file_name (str): Name of the file to save the results to.
         """
-        if self.saved_file_path == None:
-            raise ValueError("saved_file_path can't be None")
         result_df = pd.DataFrame(self.sorted_jdc, columns=['Protein', 'JDC Centrality Score'])
-        result_df.to_csv(self.saved_file_path, index=False)
+        result_df.to_csv(save_path, index=False)
 
-    def start(self):
-        if self.method == "calculate_jdc":
-            self.calculate_jdc()
-        if self.method == "export_result_to_csv":
-            self.export_result_to_csv()
+    def first_n_comparison(self, n):
+        """
+        Compare the first n elements of the result list.
+        Args:
+            result (list): The list of results.
+
+        """
+        count = 0
         
-
+        for protein_tuple in self.sorted_jdc[:n]:
+            protein_name ,score = protein_tuple
+            if protein_name in self.essential_protein_list:
+                count =  count + 1
+        print(f"There're {count} essential proteins in the top {n} predicted by algorism.")
+        return count
 
 # Example usage
-#jdc_instance = JDC('/Users/xiaoyao/Documents/ppi/data/DIP_data_with_combined_scores.csv', '/Users/xiaoyao/Documents/ppi/filtered_GE_matrix.csv', 100)
-#top_nodes = jdc_instance.calculate_jdc
-
-def parse_command_line_args():
-    parser = argparse.ArgumentParser(description='JDC Algorithm')
-    parser.add_argument("--method", required=True, type=str, help="please select the method")
-    parser.add_argument('-ppi', '--ppi_file', required=True, type=str,help='protein protein network file path for algorithm JDC')
-    parser.add_argument('-ge', '--gene_expression_file',  required=True, type=str, help='gene exprrssion file path for algorithm JDC')
-    parser.add_argument('-n', '--n', type=int, required=True, help='the number of essential proteins output')
-    parser.add_argument('-s', '--saved_file_path', type=str, default=None, help='the file path to save the result')
-    return parser.parse_args()
+# ppi_file = r"C:\Users\Administrator\Desktop\CenProteo-main\SC_Data\processed_data\DIP_data_with_combined_scores.csv"
+# gene_expression = r"C:\Users\Administrator\Desktop\CenProteo-main\SC_Data\processed_data\filtered_GE_matrix.csv"
+# essential_protein = r"C:\Users\Administrator\Desktop\CenProteo-main\SC_Data\processed_data\extracted_essential_protein.csv"
+# JDC_test =  JDC(ppi_file,gene_expression,essential_protein)
+# sorted_score = JDC_test.calculate_jdc(5) # to calculate the top n essential protein
+# JDC_test.first_n_comparison(sorted_score)  # compare the essential protein between the result and the ground truth
 
 
-if __name__ == '__main__':
-    args = parse_command_line_args()
-    jdc = JDC(**vars(args))
-    jdc.start()
