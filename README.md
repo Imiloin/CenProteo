@@ -32,65 +32,55 @@ pass
 
 ## Algorithms
 
-蛋白质网络通常表示为一个无向图 $G=(V, E)$，节点 $u\in V$ 表示一个蛋白质，边 $(u,v) \in E$ 表示两个蛋白质之间的相互作用。我们用 $N$ 表示图中节点总数，$A$ 表示图的邻接矩阵。
+蛋白质网络通常表示为一个无向图 $G=(V, E)$，节点 $u\in V$ 表示一个蛋白质，边 $(u,v) \in E$ 表示两个蛋白质之间的相互作用。我们用 $N$ 表示图中节点总数， $A$ 表示图的邻接矩阵。
 
 根据使用的数据类型，算法可以大致分为以下几类：
 
 #### 传统算法
 
-仅使用网络拓扑数据（ `CenProteo` 中实现的 `classical algortihms`）计算蛋白质的中心性：
+仅使用网络拓扑数据（`CenProteo` 中实现的 `classical algortihms`）计算蛋白质的中心性：
 
 + DC（degree centrality）度中心性：一个节点 $u$ 的度中心性 $DC(u)$ 是其连接的边数。
 
-    $$
-    DC(u) = \sum_{v} a_{u,v}
-    $$
+    $$DC(u) = \sum_{v} a_{u,v}$$
 
-+ BC（Betweenness Centrality）介数中心性：一个节点 $u$ 的中介中心性 $BC(u)$ 定义为通过节点 $u$ 的最短路径的平均比例。
++ BC（Betweenness Centrality）介数中心性：一个节点 $u$ 的介数中心性 $BC(u)$ 定义为通过节点 $u$ 的最短路径的平均比例。
 
-    $$
-    BC(u) = \sum_{s} \sum_{t} \frac{\rho(s, u, t)}{\rho(s, t)}, \quad s \neq t \neq u
-    $$
-    $\rho(s, t)$指的是$s$和$t$之间的最短路径数目，$\rho(s,u, t)$ 指的是 $s$ 和 $t$ 之间的最短路径中经过 $u$ 的数目。
+    $$BC(u) = \sum_{s} \sum_{t} \frac{\rho(s, u, t)}{\rho(s, t)}, \quad s \neq t \neq u$$
 
-+ EC（Eigenvector Centrality）特征向量中心性：一个节点 $u$的特征向量中心性 $EC(u)$ 定义为 $A$的主特征向量的第 $u$ 分量。
+    $\rho(s, t)$ 指的是 $s$ 和 $t$ 之间的最短路径数目， $\rho(s, u, t)$ 指的是 $s$ 和 $t$ 之间的最短路径中经过 $u$ 的数目。
 
-    $$
-    EC(u) = \alpha_{\max}(u)
-    $$
++ EC（Eigenvector Centrality）特征向量中心性：一个节点 $u$ 的特征向量中心性 $EC(u)$ 定义为 $A$ 的主特征向量的第 $u$ 分量。
+
+    $$EC(u) = \alpha_{\max}(u)$$
+
     $\alpha_{\max}$ 指的是 $A$ 的最大值对应的特征向量，$\alpha_{\max}(u)$ 指的是 $\alpha_{\max}$ 的第 $u$ 个分量。
 
-+ SC（Subgraph Centrality）子图中心性：一个节点 $u$的子图中心性$SC(u)$衡量的是节点 $u$参与的整个网络中子图的数量。
++ SC（Subgraph Centrality）子图中心性：一个节点 $u$ 的子图中心性 $SC(u)$ 衡量的是节点 $u$ 参与的整个网络中子图的数量。
 
-    $$
-    SC(u) = \sum_{l=0}^{\infty} \frac{\mu_{l}(u)}{l!}
-    $$
-    $\mu_{l}(u) $指的是开始并结束于节点$u$且长度为$l$的环路数目。
+    $$SC(u) = \sum_{l=0}^{\infty} \frac{\mu_{l}(u)}{l!}$$
 
-+ IC（Information Centrality）信息中心性：一个节点 $u$的信息中心性$IC(u)$衡量的是以节点 $u$ 结束的路径长度的调和平均值。
+    $\mu_{l}(u)$ 指的是开始并结束于节点 $u$ 且长度为 $l$ 的环路数目。
 
-    $$
-    IC(u) = \left[\frac{1}{N} \sum_{v} \frac{1}{I_{uv}}\right]^{-1},I_{uv} = (c_{uu} + c_{vv} - c_{uv})^{-1},C = (c_{uv}) = [D - A + J]^{-1}
-    $$
-    $D$ 为每个节点度的对角矩阵，$C$ 是改进的邻接矩阵，$J$ 是所有元素都为1的矩阵。
++ IC（Information Centrality）信息中心性：一个节点 $u$ 的信息中心性 $IC(u)$ 衡量的是以节点 $u$ 结束的路径长度的调和平均值。
+
+    $$IC(u) = \left[\frac{1}{N} \sum_{v} \frac{1}{I_{uv}}\right]^{-1},I_{uv} = (c_{uu} + c_{vv} - c_{uv})^{-1},C = (c_{uv}) = [D - A + J]^{-1}$$
+
+    $D$ 为每个节点度的对角矩阵，$C$ 是改进的邻接矩阵，$J$ 是所有元素都为 1 的矩阵。
 
     在 `CenProteo` 中，为简化计算，信息中心性通过计算 `curent flow centrality` 来近似。
 
 + CC（Closeness Centrality）接近中心性：一个节点 $u$的接近中心性 $CC(u)$ 是从节点 $u$ 到网络中所有其他节点的图理论距离之和的倒数。
 
-    $$
-    CC(u) = \frac{N - 1}{\sum_{v} d(u, v)}.
-    $$
+    $$CC(u) = \frac{N - 1}{\sum_{v} d(u, v)}$$
+
     $d(u,v)$ 指的是从节点 $u$ 到结点 $n$ 的距离。
 
-+ NC（Neighbor Centrality）邻居中心性：节点 $u$ 的邻域中心性 $𝑁𝐶(𝑢)$定义为节点 $u$ 邻居之间的边聚类系数（Edge Clustering Coefficient, ECC）之和。
++ NC（Neighbor Centrality）邻居中心性：节点 $u$ 的邻域中心性 $NC(u)$ 定义为节点 $u$ 邻居之间的边聚类系数（Edge Clustering Coefficient, ECC）之和。
 
-    $$
-    NC(u) = \sum_{v \in N_u} ECC(u, v), \
-    ECC(u, v) = \frac{z_{u, v}}{\min(d_u - 1, d_v - 1)}, \ 
-    z_{u, v} = \sum_{w} A_{uw} A_{vw}
-    $$
-    边聚类系数 $ECC(u, v)$ 表示节点 $u$和节点 $v$之间的共同邻居数 $z_{u, v}$ 与两者度数的最小值之比， $A_{uw}$ 和 $A_{vw}$ 分别表示节点 $u$和 $v$ 是否与节点 $w$ 相连。
+    $$\begin{align\*} NC(u) &= \sum\_{v \in N\_u} ECC(u, v), \\\\\\ ECC(u, v) &= \frac{z\_{u, v}}{\min(d\_u - 1, d\_v - 1)}, \\\\\\ z\_{u, v} &= \sum\_{w} A\_{uw} A\_{vw} \end{align\*}$$
+
+    边聚类系数 $ECC(u, v)$ 表示节点 $u$ 和节点 $v$ 之间的共同邻居数 $z_{u, v}$ 与两者度数的最小值之比， $A_{uw}$ 和 $A_{vw}$ 分别表示节点 $u$ 和 $v$ 是否与节点 $w$ 相连。
 
    
 
