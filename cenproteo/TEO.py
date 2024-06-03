@@ -157,7 +157,7 @@ class TEO:
         return count
         
     
-    def get_score_table(self, GO_term, result_path):
+    def export_results_to_csv(self, GO_term, result_path):
         # get the TEO score result in a csv file
         if GO_term == 'BP':
             score_list = list(self.TEO_BP.items())
@@ -171,3 +171,13 @@ class TEO:
             writer.writerow(["Protein", f"TEO_Score_{GO_term}"])
             for key, value in score_list:
                 writer.writerow([key, value])
+
+
+
+# Example Usage
+# ppi_file = r'SC_Data/processed_data/combined_data.csv'
+# gene_expression_file = r'SC_Data/processed_data/filtered_GE_matrix.csv'
+# essential_protein_file = r'SC_Data/processed_data/extracted_essential_protein.csv'
+# teo = TEO(ppi_file, gene_expression_file, essential_protein_file)
+# # teo.export_results_to_csv('BP', r'TEO_BP_result.csv')
+# teo.first_n_comparison(200, 'BP')

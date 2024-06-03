@@ -96,9 +96,9 @@ pass（数据集来源，数据预处理方法和简单代码示例）
   reference: Li S, Zhang Z, Li X, *et al*. An iteration model for identifying essential proteins by combining comprehensive PPI network with biological information. *BMC bioinformatics*, 2021, 22: 1-25.https://doi.org/10.1186/s12859-021-04300-7
 
 + JDC algorithm：
-  
-  **img here**
-
+<div align="center">
+<img src=README.assets/JDC.png width=50% />
+</div>
   reference: Zhong, J., Tang, C., Peng, W. *et al.* A novel essential protein identification method based on PPI networks and gene expression data. *BMC Bioinformatics* 22, 248 (2021). https://doi.org/10.1186/s12859-021-04175-8
   
 + TEO algorithm：

@@ -296,9 +296,27 @@ class TGSO:
                 count += 1
         print( f"There're {count} essential proteins in the top {n} predicted by TGSO algorism. \nThe iteration has been repeated for {self.iter_time} times.")
         return count
+    
+    def export_results_to_csv(self, file_path):
+        # Ensure the 'protein_score' dictionary is not empty
+        if not self.protein_score:
+            print("No scores to export. Please run the calculation first.")
+            return
 
+        # Open the file and write the headers and data
+        with open(file_path, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(['Protein', 'Score'])  # Writing header
+            for protein, score in sorted(self.protein_score.items(), key=lambda item: item[1], reverse=True):
+                writer.writerow([protein, score])  # Writing each protein and its score
+    
+    
+# Example Usage
 # ppi_file = r'SC_Data/processed_data/combined_data.csv'
 # gene_expression_file = r'SC_Data/processed_data/filtered_GE_matrix.csv'
 # subcellular_localization_file = r'SC_Data/processed_data/yeast_compartment_knowledge_full.csv'
 # essential_protein_file = r'SC_Data/processed_data/extracted_essential_protein.csv'
-# tgso = TGSO(ppi_file, gene_expression_file, subcellular_localization_file, essential_protein_file)
+# i_score_file = r'SC_Data/processed_data/I_score.csv'
+# tgso = TGSO(ppi_file, gene_expression_file, subcellular_localization_file, i_score_file, essential_protein_file)
+# # tgso.first_n_comparison(200)
+# tgso.export_results_to_csv('TGSO_result.csv')
