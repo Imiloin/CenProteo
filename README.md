@@ -19,17 +19,58 @@
     <img src="README.assets/asb_network_blue.svg" alt="asb_network_blue" width="200"/>
 </div>
 
-在过去的几十年中，对于单一蛋白质的性质及功能方面的研究取得了很大进展。但是，蛋白质在生物体内很少单独发挥作用，因此了解蛋白质之间的相互作用对于揭示复杂分子机制至关重要。近年来，酵母双杂交系统（Yeast Two-Hybrid, Y2H），交叉链接质谱法（Cross-linking Mass Spectrometry, XL-MS）等高通量实验技术快速发展，使得越来越多蛋白质之间的相互作用被研究和发表，也积累了大量的相关实验数据，由此构建出蛋白质相互作用网络（Protein–Protein Interactions Network, PPIN） 。在 PPIN 中，关键蛋白具有特定的拓扑位置和功能角色，对维持网络的稳定性和功能具有重要影响。为了从 PPIN 中发现关键蛋白，一系列如度中心性（Degree Centrality），介数中心性（Betweenness Centrality），聚类系数（Clustering Coefficient）等图论中的传统算法被应用到 PPIN 中，但这些算法往往忽略了蛋白质的功能作用，仅关注网络拓扑结构。
+**如何在蛋白质互作网络 (protein-protein interaction netwrok) 中寻找关键蛋白**
 
-介绍一下新的算法。。。。。（传统算法的劣势，新算法的优势）
+在过去的几十年中，对于单一蛋白质的性质及功能方面的研究取得了很大进展。但是，蛋白质在生物体内很少单独发挥作用，因此了解蛋白质之间的相互作用对于揭示复杂分子机制至关重要。近年来，酵母双杂交系统（Yeast Two-Hybrid, Y2H），交叉链接质谱法（Cross-linking Mass Spectrometry, XL-MS）等高通量实验技术快速发展，使得越来越多蛋白质之间的相互作用被研究和发表，也积累了大量的相关实验数据，由此构建出蛋白质相互作用网络（PPIN） 。在 PPIN 中，关键蛋白具有特定的拓扑位置和功能角色，对维持网络的稳定性和功能具有重要影响。为了从 PPIN 中发现关键蛋白，出现了一系列如度中心性（Degree Centrality），介数中心性（Betweenness Centrality），聚类系数（Clustering Coefficient）等传统算法。
 
-本项目构建了包 `cenproteo` ，实现了若干计算蛋白质网络中各蛋白质的中心性并进行排序从而寻找关键蛋白质的算法，验证算法的准确性并进行了效果比对。
+本项目构建了包 `CenProteo` ，实现了几种计算蛋白质网络中蛋白质的中心性，并进行排序从而寻找关键蛋白质的算法。
 
 
 
 ## 🗂️ Data Source & Preprocessing
 
-pass（数据集来源，数据预处理方法和简单代码示例）
+在`CenProteo` python package中的几种算法中，使用了酿酒酵母（Saccharomyces cerevisiae）的蛋白质互作信息，主要用到了以下几种数据：
+
+* 蛋白质互作对及蛋白质GO语义相似性数值（The GO similarity value for BP, MF, and CC under the DIP PPI dataset and the combined PPI dataset）：
+
+   基因本体论术语（Gene Ontology term）是生物信息学中用来标准化基因产品属性的一种方式，允许研究人员以一种标准化的方式注释基因和蛋白质的功能，有助于数据的共享和比较。GO术语覆盖了三个主要领域：分子功能（Molecular Function，MF），细胞组分（Cellular Component，tCC）和生物过程（Biological Process，BP）。
+
+   数据来自文献Zhang W, Xu J, Li Y, *et al*. Detecting essential proteins based on network topology, gene expression data, and gene ontology information. *IEEE/ACM transactions on computational biology and bioinformatics*, 2016, 15(1): 109-116.支撑材料。
+
+* 已知关键蛋白表：数据来自[DEG database](https://tubic.org/deg/public/index.php/query/eukaryotes/degac/DEG2001.html?lineage=eukaryotes&field=degac&term=DEG2001&page=1)，选择`Download > Eukaryotes > Organisms`，下载`Saccharomyces cerevisiae`的关键蛋白信息。数据处理过程如下：
+
+   * 通过python脚本，从原文件中提取关键蛋白名称，写入新的`.csv`文件；
+
+   * 从[STRING database](https://cn.string-db.org/cgi/input?sessionId=bWGl1KdZES6m&input_page_show_search=on)中获取两种蛋白质（基因）编码方式的名称对照表，并利用脚本得到对应的蛋白名称，写入`.csv`文档；
+   * 利用得到的对应名称，对关键蛋白的名称进行更新（同时包含两种命名模式），便于后续在算法中使用。
+
+* 基因表达量数据：
+
+   基因表达量数据是指在特定时间、特定条件或特定细胞类型中，各个基因产生的RNA分子数量的测量数据。由于具有一定相似性的蛋白更有可能共表达，可以利用基因表达量数据计算皮尔逊相关系数（PCC），从而表明一对蛋白的相关性强弱。
+
+   数据通过文献B. P. Tu, A. Kudlicki, M. Rowicka, and S. L. McKnight, “Logic of the yeast metabolic cycle: Temporal compartmentalization of cel- lular processes,” Science, vol. 310, no. 5751, pp. 1152–1158, Nov.2005.提供的数据编号（GSE3431），从NCBI中下载相应的基因表达量数据。处理方法如下：
+
+   * 下载基因表达量原文件，删去数据以外的多余部分，并将数据写入`.csv`文件；
+   * 对数据进行过滤，如果该蛋白不存在于酿酒酵母互作蛋白对中，则删去，其余保留；
+   * 通过GSE3431数据页面进入测序平台GPL90信息页面，下载该基因表达量测定的注释文件，通过脚本将原过滤文件中的通道编号替换为对应的蛋白质编号，如不存在则删去。
+
+* 亚细胞定位数据：
+
+   研究表明，很多互作蛋白对都存在与细胞中的同一分区或邻近分区内。因此亚细胞定位数据对于发现关键蛋白有一定帮助。
+
+   数据来自[COMPARTMENT database](https://compartments.jensenlab.org/Downloads)，选择`All channels integrated`中的`yeast`选项进行下载。处理方法如下：
+
+   * 将原始数据粘贴入`.csv`文档；
+   * 通过11个亚细胞定位分区所对应的GO术语，对数据进行筛选，将符合这11个GO术语的数据保存到新的`.csv`文件，用于后续计算。
+
+* 基因同源性数据：
+
+   研究发现，蛋白质的关键程度与其在进化中的保守性有一定关系。如果一个蛋白在多个物种中具有同源蛋白，则该蛋白更有可能为关键蛋白。
+
+   数据来自[InParanoid database (version 7)](https://inparanoid8.sbc.su.se/download/old_versions/data_7.0/)，选择`sqltables.tgz`进行下载，后续处理如下：
+
+   * 解压文件，利用脚本选择与酿酒酵母有关的数据保存，写入`.csv`文件，删去其余文件；
+   * 通过脚本遍历筛选得到的每个文件，筛选同源性100%的基因编号保存，并计算每一种同源基因编号在不同物种中出现的次数，计入`.csv`文档。
 
 
 
@@ -41,7 +82,7 @@ pass（数据集来源，数据预处理方法和简单代码示例）
 
 #### 传统算法
 
-仅使用网络拓扑数据（`cenproteo` 中实现的 `classical algortihms`）计算蛋白质的中心性：
+仅使用网络拓扑数据（`CenProteo` 中实现的 `classical algortihms`）计算蛋白质的中心性：
 
 + DC（degree centrality）度中心性：一个节点 $u$ 的度中心性 $DC(u)$ 是其连接的边数。
 
@@ -71,9 +112,9 @@ pass（数据集来源，数据预处理方法和简单代码示例）
 
     $D$ 为每个节点度的对角矩阵， $C$ 是改进的邻接矩阵， $J$ 是所有元素都为 1 的矩阵。
 
-    在 `cenproteo` 中，为简化计算，信息中心性通过计算 `current flow centrality` 来近似。
+    在 `CenProteo` 中，为简化计算，信息中心性通过计算 `curent flow centrality` 来近似。
 
-+ CC（Closeness Centrality）接近中心性：一个节点 $u$ 的接近中心性 $CC(u)$ 是从节点 $u$ 到网络中所有其他节点的图理论距离之和的倒数。
++ CC（Closeness Centrality）接近中心性：一个节点 $u$的接近中心性 $CC(u)$ 是从节点 $u$ 到网络中所有其他节点的图理论距离之和的倒数。
 
     $$CC(u) = \frac{N - 1}{\sum_{v} d(u, v)}$$
 
@@ -85,31 +126,53 @@ pass（数据集来源，数据预处理方法和简单代码示例）
     $$ECC(u, v) = \frac{z_{u, v}}{\min(d_u - 1, d_v - 1)},$$
     $$z_{u, v} = \sum_{w} A_{uw} A_{vw}.$$
 
-    边聚类系数 $ECC(u, v)$ 表示节点 $u$ 和节点 $v$ 之间的共同邻居数 $z_{u, v}$ 与两者度数的最小值之比， $A_{uw}$ 和 $A_{vw}$ 分别表示节点 $u$ 和 $v$ 是否与节点 $w$ 相连。  
+    边聚类系数 $ECC(u, v)$ 表示节点 $u$ 和节点 $v$ 之间的共同邻居数 $z_{u, v}$ 与两者度数的最小值之比， $A_{uw}$ 和 $A_{vw}$ 分别表示节点 $u$ 和 $v$ 是否与节点 $w$ 相连。
+
+   
 
 #### 现代算法
 
-一些文献提出了新的算法，在网络拓扑数据的基础上使用基因表达量等更多生物数据，对关键蛋白做更准确的预测。
+使用网络拓扑数据和基因表达量等生物数据，主要实现以下几种方法：
 
 + TGSO algorithm：
+
+<img src="README.assets/pseudo_code_TGSO.jpg" style="zoom: 100%;" />
+
+​		计算流程框架：
+
+```mermaid
+   flowchart TD
+         A[Initialize S, lambda, p] --> B[Compute ADN]
+         A --> C[Compute PCC]
+         A --> D[Compute CEN]
+         A --> E[Compute CLN]
+         B --> F[Combine results to compute initial matrix]
+         C --> F
+         D --> F
+         E --> F
+         F --> G[Compute LSG]
+         G --> H[Initialize IS]
+         H --> I[Iterate to find k seeds]
+         I --> J[Update S]
+```
 
   reference: Li S, Zhang Z, Li X, *et al*. An iteration model for identifying essential proteins by combining comprehensive PPI network with biological information. *BMC bioinformatics*, 2021, 22: 1-25.https://doi.org/10.1186/s12859-021-04300-7
 
 + JDC algorithm：
-<div align="center">
-<img src=README.assets/JDC.png width=50% />
-</div>
+  
+<img src="README.assets/pseudo_code_JDC.jpeg" style="zoom: 50%;" />
+
   reference: Zhong, J., Tang, C., Peng, W. *et al.* A novel essential protein identification method based on PPI networks and gene expression data. *BMC Bioinformatics* 22, 248 (2021). https://doi.org/10.1186/s12859-021-04175-8
   
 + TEO algorithm：
+
+<img src="README.assets/pseudo_code_TEO.jpg" style="zoom: 45%;" />
   
   reference: Zhang W, Xu J, Li Y, *et al*. Detecting essential proteins based on network topology, gene expression data, and gene ontology information. *IEEE/ACM transactions on computational biology and bioinformatics*, 2016, 15(1): 109-116.https://ieeexplore.ieee.org/document/7586077
 
 
 
 ## 🔧 Installation
-
-本仓库提供了 `cenprotro` 的源代码供安装。
 
 #### Clone this repo
 
@@ -126,4 +189,92 @@ pip install -e .
 
 ## ♾️ Usage
 
-Pass
+* `main.py` 是一个用于寻找关键蛋白的脚本。它接受以下命令行参数：
+
+* ` -h, --help`：获得帮助信息
+
+* `--ppi PPI`：输入相互作用的蛋白对信息的文件地址（`.csv`文档，下同），必选参数
+
+* `--ge GE`：输入基因表达量数据的文件地址，仅JDE, TEO, TGSO算法需要
+
+* `--loc LOC`：输入蛋白亚细胞定位信息的文件地址，仅TGSO算法需要
+
+* `--iscore ISCORE`：输入基因同源性记数的文件地址，仅TGSO算法需要
+
+* `--ess ESS`：输入已知的关键蛋白列表文件地址，必选参数
+
+* `--algo {classical,JDC,TEO,TGSO}`：选择关键蛋白的算法，必选参数
+
+* `--action {export_csv,compare_n}`：选择需要进行的操作，可以将每个蛋白质关键性的得分输入`.csv`文档，或与已知的关键蛋白列表进行对比，检查打分最高的前n个中有几个是已知的关键蛋白（即检测算法准确性），必选参数
+
+* `--out OUT`：输出蛋白质得分`.csv`文件的保存地址，仅选择的`--action`为`export_csv`时需要
+
+* `--n N`：需要与已知关键蛋白列表进行对比的前n个蛋白数量，仅选择的`--action`为`compare_n`时需要
+
+* `--go {BP,MF,tCC}`：选择进行计算的GO的术语类型，仅选择的`--algo`为`TEO`时需要
+
+* ` --method {DC,BC,NC,cCC,EC,IC,SC}`：选择进行计算的经典算法，仅选择的`--algo`为`classical`时需要
+
+
+
+可以通过以下命令获得帮助信息：
+
+```shell
+python main.py --help
+```
+
+得到的具体帮助信息如下：
+
+```shell
+usage: main.py [-h] --ppi PPI [--ge GE] [--loc LOC] [--iscore ISCORE] --ess ESS --algo {classical,JDC,TEO,TGSO} --action {export_csv,compare_n} [--out OUT] [--n N] [--go {BP,MF,tCC}] [--method {DC,BC,NC,cCC,EC,IC,SC}]
+
+Run various protein network analysis algorithms and export the score for each protein to a .csv file or compare top N
+results with the known essential proteins table.
+
+options:
+  -h, --help            show this help message and exit
+  --ppi PPI             Path to the protein-protein interaction network file (.csv format)
+  --ge GE               Path to the gene expression data file
+  --loc LOC             Path to the subcellular localization data file (required only for TGSO algorithm)
+  --iscore ISCORE       Path to the gene orthology data file (required only for TGSO algorithm)
+  --ess ESS             Path to the essential proteins data CSV file
+  --algo {classical,JDC,TEO,TGSO}
+                        Choose the algorithm from classical, JDC, TEO, or TGSO to run.
+  --action {export_csv,compare_n}
+                        Select the operation to perform: export to CSV or compare top N essential proteins results
+  --out OUT             Path where the output CSV file for the protein score will be saved
+  --n N                 Number of top N results to compare
+  --go {BP,MF,tCC}      choose the GO term to use from BP, MF, or tCC (required only for TEO algorithm)
+  --method {DC,BC,NC,cCC,EC,IC,SC}
+                        choose the centrality method to run from DC, BC, NC, cCC, EC, IC, or SC (required only for classical algorithm)
+```
+
+
+
+以下是几个运行示例：
+
+* 通过TEO算法，利用BP作为GO术语，计算得到蛋白质打分文件并输出：
+
+  ```shell
+  python main.py --ppi 'SC_Data/processed_data/combined_data.csv' --ge 'SC_Data/processed_data/filtered_GE_matrix.csv' --ess 'SC_Data/processed_data/extracted_essential_protein.csv' --algo TEO --action export_csv --out 'TEO_BP_result.csv' --go 'BP'
+  ```
+
+* 通过classical算法中的NC算法，将得分最高的前100个蛋白与关键蛋白列表进行对比：
+
+  ```shell
+  python main.py --ppi 'SC_Data/processed_data/combined_data.csv' --ess 'SC_Data/processed_data/extracted_essential_protein.csv' --algo classical --method NC --action compare_n --n 100
+  ```
+
+
+
+## 📈 Results & Comparison
+
+将`CenProteo` python package中的几种算法进行对比，当选择不同的n进行测试时，得分最高的前n个蛋白中正确的关键蛋白数量如下：
+
+<img src="README.assets/comparison_fig.jpeg" alt="img"  />
+
+分别取N=100，200，400进行对比：
+
+<img src="README.assets/N=100_200_400.jpeg" alt="img" style="zoom:67%;" />
+
+其中TGSO算法的正确性略高于其他算法，且当所选取的n值较小时，各算法的准确性相对较高。
