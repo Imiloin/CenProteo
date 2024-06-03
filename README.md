@@ -71,9 +71,9 @@ pass（数据集来源，数据预处理方法和简单代码示例）
 
     $D$ 为每个节点度的对角矩阵， $C$ 是改进的邻接矩阵， $J$ 是所有元素都为 1 的矩阵。
 
-    在 `cenproteo` 中，为简化计算，信息中心性通过计算 `curent flow centrality` 来近似。
+    在 `cenproteo` 中，为简化计算，信息中心性通过计算 `current flow centrality` 来近似。
 
-+ CC（Closeness Centrality）接近中心性：一个节点 $u$的接近中心性 $CC(u)$ 是从节点 $u$ 到网络中所有其他节点的图理论距离之和的倒数。
++ CC（Closeness Centrality）接近中心性：一个节点 $u$ 的接近中心性 $CC(u)$ 是从节点 $u$ 到网络中所有其他节点的图理论距离之和的倒数。
 
     $$CC(u) = \frac{N - 1}{\sum_{v} d(u, v)}$$
 
