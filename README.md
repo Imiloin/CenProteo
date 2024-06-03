@@ -54,7 +54,7 @@ pass
 
     $$EC(u) = \alpha_{\max}(u)$$
 
-    $\alpha_{\max}$ 指的是 $A$ 的最大值对应的特征向量，$\alpha_{\max}(u)$ 指的是 $\alpha_{\max}$ 的第 $u$ 个分量。
+    $\alpha_{\max}$ 指的是 $A$ 的最大值对应的特征向量， $\alpha_{\max}(u)$ 指的是 $\alpha_{\max}$ 的第 $u$ 个分量。
 
 + SC（Subgraph Centrality）子图中心性：一个节点 $u$ 的子图中心性 $SC(u)$ 衡量的是节点 $u$ 参与的整个网络中子图的数量。
 
@@ -66,7 +66,7 @@ pass
 
     $$IC(u) = \left[\frac{1}{N} \sum_{v} \frac{1}{I_{uv}}\right]^{-1},I_{uv} = (c_{uu} + c_{vv} - c_{uv})^{-1},C = (c_{uv}) = [D - A + J]^{-1}$$
 
-    $D$ 为每个节点度的对角矩阵，$C$ 是改进的邻接矩阵，$J$ 是所有元素都为 1 的矩阵。
+    $D$ 为每个节点度的对角矩阵， $C$ 是改进的邻接矩阵， $J$ 是所有元素都为 1 的矩阵。
 
     在 `CenProteo` 中，为简化计算，信息中心性通过计算 `curent flow centrality` 来近似。
 
@@ -78,7 +78,9 @@ pass
 
 + NC（Neighbor Centrality）邻居中心性：节点 $u$ 的邻域中心性 $NC(u)$ 定义为节点 $u$ 邻居之间的边聚类系数（Edge Clustering Coefficient, ECC）之和。
 
-    $$\begin{align\*} NC(u) &= \sum\_{v \in N\_u} ECC(u, v), \\\\\\ ECC(u, v) &= \frac{z\_{u, v}}{\min(d\_u - 1, d\_v - 1)}, \\\\\\ z\_{u, v} &= \sum\_{w} A\_{uw} A\_{vw} \end{align\*}$$
+    $$NC(u) = \sum_{v \in N_u} ECC(u, v),$$ 
+    $$ECC(u, v) = \frac{z_{u, v}}{\min(d_u - 1, d_v - 1)},$$
+    $$z_{u, v} = \sum_{w} A_{uw} A_{vw}.$$
 
     边聚类系数 $ECC(u, v)$ 表示节点 $u$ 和节点 $v$ 之间的共同邻居数 $z_{u, v}$ 与两者度数的最小值之比， $A_{uw}$ 和 $A_{vw}$ 分别表示节点 $u$ 和 $v$ 是否与节点 $w$ 相连。
 
