@@ -19,15 +19,17 @@
     <img src="README.assets/asb_network_blue.svg" alt="asb_network_blue" width="200"/>
 </div>
 
-在过去的几十年中，对于单一蛋白质的性质及功能方面的研究取得了很大进展。但是，蛋白质在生物体内很少单独发挥作用，因此了解蛋白质之间的相互作用对于揭示复杂分子机制至关重要。近年来，酵母双杂交系统（Yeast Two-Hybrid, Y2H），交叉链接质谱法（Cross-linking Mass Spectrometry, XL-MS）等高通量实验技术快速发展，使得越来越多蛋白质之间的相互作用被研究和发表，也积累了大量的相关实验数据，由此构建出蛋白质相互作用网络（PPIN） 。在 PPIN 中，关键蛋白具有特定的拓扑位置和功能角色，对维持网络的稳定性和功能具有重要影响。为了从 PPIN 中发现关键蛋白，出现了一系列如度中心性（Degree Centrality），介数中心性（Betweenness Centrality），聚类系数（Clustering Coefficient）等传统算法。
+在过去的几十年中，对于单一蛋白质的性质及功能方面的研究取得了很大进展。但是，蛋白质在生物体内很少单独发挥作用，因此了解蛋白质之间的相互作用对于揭示复杂分子机制至关重要。近年来，酵母双杂交系统（Yeast Two-Hybrid, Y2H），交叉链接质谱法（Cross-linking Mass Spectrometry, XL-MS）等高通量实验技术快速发展，使得越来越多蛋白质之间的相互作用被研究和发表，也积累了大量的相关实验数据，由此构建出蛋白质相互作用网络（Protein–Protein Interactions Network, PPIN） 。在 PPIN 中，关键蛋白具有特定的拓扑位置和功能角色，对维持网络的稳定性和功能具有重要影响。为了从 PPIN 中发现关键蛋白，一系列如度中心性（Degree Centrality），介数中心性（Betweenness Centrality），聚类系数（Clustering Coefficient）等图论中的传统算法被应用到 PPIN 中，但这些算法往往忽略了蛋白质的功能作用，仅关注网络拓扑结构。
 
-本项目构建了包 `CenProteo` ，实现了几种计算蛋白质网络中蛋白质的中心性，并进行排序从而寻找关键蛋白质的算法。
+介绍一下新的算法。。。。。（传统算法的劣势，新算法的优势）
+
+本项目构建了包 `cenproteo` ，实现了若干计算蛋白质网络中各蛋白质的中心性并进行排序从而寻找关键蛋白质的算法，验证算法的准确性并进行了效果比对。
 
 
 
 ## 🗂️ Data Source & Preprocessing
 
-pass
+pass（数据集来源，数据预处理方法和简单代码示例）
 
 
 
@@ -39,7 +41,7 @@ pass
 
 #### 传统算法
 
-仅使用网络拓扑数据（`CenProteo` 中实现的 `classical algortihms`）计算蛋白质的中心性：
+仅使用网络拓扑数据（`cenproteo` 中实现的 `classical algortihms`）计算蛋白质的中心性：
 
 + DC（degree centrality）度中心性：一个节点 $u$ 的度中心性 $DC(u)$ 是其连接的边数。
 
@@ -69,7 +71,7 @@ pass
 
     $D$ 为每个节点度的对角矩阵， $C$ 是改进的邻接矩阵， $J$ 是所有元素都为 1 的矩阵。
 
-    在 `CenProteo` 中，为简化计算，信息中心性通过计算 `curent flow centrality` 来近似。
+    在 `cenproteo` 中，为简化计算，信息中心性通过计算 `curent flow centrality` 来近似。
 
 + CC（Closeness Centrality）接近中心性：一个节点 $u$的接近中心性 $CC(u)$ 是从节点 $u$ 到网络中所有其他节点的图理论距离之和的倒数。
 
@@ -87,7 +89,7 @@ pass
 
 #### 现代算法
 
-使用网络拓扑数据和基因表达量等生物数据，主要实现以下几种方法：
+一些文献提出了新的算法，在网络拓扑数据的基础上使用基因表达量等更多生物数据，对关键蛋白做更准确的预测。
 
 + TGSO algorithm：
 
@@ -96,6 +98,7 @@ pass
 + JDC algorithm：
   
   **img here**
+
   reference: Zhong, J., Tang, C., Peng, W. *et al.* A novel essential protein identification method based on PPI networks and gene expression data. *BMC Bioinformatics* 22, 248 (2021). https://doi.org/10.1186/s12859-021-04175-8
   
 + TEO algorithm：
@@ -121,6 +124,6 @@ cd CenProteo
 pip install -e .
 ```
 
-## Usage
+## ♾️ Usage
 
 Pass
