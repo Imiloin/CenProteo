@@ -23,7 +23,7 @@
 
 在过去的几十年中，对于单一蛋白质的性质及功能方面的研究取得了很大进展。但是，蛋白质在生物体内很少单独发挥作用，因此了解蛋白质之间的相互作用对于揭示复杂分子机制至关重要。近年来，酵母双杂交系统（Yeast Two-Hybrid, Y2H），交叉链接质谱法（Cross-linking Mass Spectrometry, XL-MS）等高通量实验技术快速发展，使得越来越多蛋白质之间的相互作用被研究和发表，也积累了大量的相关实验数据，由此构建出蛋白质相互作用网络（PPIN） 。在 PPIN 中，关键蛋白具有特定的拓扑位置和功能角色，对维持网络的稳定性和功能具有重要影响。为了从 PPIN 中发现关键蛋白，出现了一系列如度中心性（Degree Centrality），介数中心性（Betweenness Centrality），聚类系数（Clustering Coefficient）等传统算法。
 
-本项目构建了包 `CenProteo` ，实现了几种计算蛋白质网络中蛋白质的中心性，并进行排序从而寻找关键蛋白质的算法。
+本项目构建了包 `cenproteo` ，实现了几种计算蛋白质网络中蛋白质的中心性，并进行排序从而寻找关键蛋白质的算法。
 
 
 
@@ -61,7 +61,7 @@
    数据来自[COMPARTMENT database](https://compartments.jensenlab.org/Downloads)，选择`All channels integrated`中的`yeast`选项进行下载。处理方法如下：
 
    * 将原始数据粘贴入`.csv`文档；
-   * 通过11个亚细胞定位分区所对应的GO术语，对数据进行筛选，将符合这11个GO术语的数据保存到新的`.csv`文件，用于后续计算。
+   * 通过 11 个亚细胞定位分区所对应的 GO 术语，对数据进行筛选，将符合这 11 个 GO 术语的数据保存到新的`.csv`文件，用于后续计算。
 
 * 基因同源性数据：
 
@@ -189,83 +189,41 @@ pip install -e .
 
 ## ♾️ Usage
 
-* `main.py` 是一个用于寻找关键蛋白的脚本。它接受以下命令行参数：
-
-* ` -h, --help`：获得帮助信息
-
-* `--ppi PPI`：输入相互作用的蛋白对信息的文件地址（`.csv`文档，下同），必选参数
-
-* `--ge GE`：输入基因表达量数据的文件地址，仅JDE, TEO, TGSO算法需要
-
-* `--loc LOC`：输入蛋白亚细胞定位信息的文件地址，仅TGSO算法需要
-
-* `--iscore ISCORE`：输入基因同源性记数的文件地址，仅TGSO算法需要
-
-* `--ess ESS`：输入已知的关键蛋白列表文件地址，必选参数
-
-* `--algo {classical,JDC,TEO,TGSO}`：选择关键蛋白的算法，必选参数
-
-* `--action {export_csv,compare_n}`：选择需要进行的操作，可以将每个蛋白质关键性的得分输入`.csv`文档，或与已知的关键蛋白列表进行对比，检查打分最高的前n个中有几个是已知的关键蛋白（即检测算法准确性），必选参数
-
-* `--out OUT`：输出蛋白质得分`.csv`文件的保存地址，仅选择的`--action`为`export_csv`时需要
-
-* `--n N`：需要与已知关键蛋白列表进行对比的前n个蛋白数量，仅选择的`--action`为`compare_n`时需要
-
-* `--go {BP,MF,tCC}`：选择进行计算的GO的术语类型，仅选择的`--algo`为`TEO`时需要
-
-* ` --method {DC,BC,NC,cCC,EC,IC,SC}`：选择进行计算的经典算法，仅选择的`--algo`为`classical`时需要
-
-
-
-可以通过以下命令获得帮助信息：
-
-```shell
-python main.py --help
-```
-
-得到的具体帮助信息如下：
-
-```shell
-usage: main.py [-h] --ppi PPI [--ge GE] [--loc LOC] [--iscore ISCORE] --ess ESS --algo {classical,JDC,TEO,TGSO} --action {export_csv,compare_n} [--out OUT] [--n N] [--go {BP,MF,tCC}] [--method {DC,BC,NC,cCC,EC,IC,SC}]
-
-Run various protein network analysis algorithms and export the score for each protein to a .csv file or compare top N
-results with the known essential proteins table.
-
-options:
-  -h, --help            show this help message and exit
-  --ppi PPI             Path to the protein-protein interaction network file (.csv format)
-  --ge GE               Path to the gene expression data file
-  --loc LOC             Path to the subcellular localization data file (required only for TGSO algorithm)
-  --iscore ISCORE       Path to the gene orthology data file (required only for TGSO algorithm)
-  --ess ESS             Path to the essential proteins data CSV file
-  --algo {classical,JDC,TEO,TGSO}
-                        Choose the algorithm from classical, JDC, TEO, or TGSO to run.
-  --action {export_csv,compare_n}
-                        Select the operation to perform: export to CSV or compare top N essential proteins results
-  --out OUT             Path where the output CSV file for the protein score will be saved
-  --n N                 Number of top N results to compare
-  --go {BP,MF,tCC}      choose the GO term to use from BP, MF, or tCC (required only for TEO algorithm)
-  --method {DC,BC,NC,cCC,EC,IC,SC}
-                        choose the centrality method to run from DC, BC, NC, cCC, EC, IC, or SC (required only for classical algorithm)
-```
-
-
-
-以下是几个运行示例：
-
-* 通过TEO算法，利用BP作为GO术语，计算得到蛋白质打分文件并输出：
-
-  ```shell
-  python main.py --ppi 'SC_Data/processed_data/combined_data.csv' --ge 'SC_Data/processed_data/filtered_GE_matrix.csv' --ess 'SC_Data/processed_data/extracted_essential_protein.csv' --algo TEO --action export_csv --out 'TEO_BP_result.csv' --go 'BP'
+#### classical algorithms
+* 导入classical_algorithms模块，选择算法（这里以DC为例）并计算得到排序后网络中所有蛋白质的中心性分数：
+  ```python
+  from cenproteo import classical_algorithms
+  class_test = classical_algorithms(<path_to_ppi_file>)
+  dc_sorted_score = class_test.DC()
+  ```
+  
+* 将结果存储为`.csv`文件：
+  ```python
+  class_test.export_result_to_csv(dc_sorted_score, <path_to_save_result>)
+  ```
+  
+* 如果有金标准文件，将算法得到的关键蛋白质与金标准进行比较，输出n个关键蛋白质中预测正确的个数：
+  ```python
+  class_test.first_n_comparison(n, dc_sorted_score, <path_to_real_essential_protein_file>)
+  ```
+#### JDC algorithm, TGSO algorithm and TEO algorithm
+以JDC模块为例，TGSO模块和TEO模块用法与JDC模块相同。
+* 导入JDC模块，运用JDC算法计算得到排序后网络中所有蛋白质的JDC中心性分数：
+  ```python
+  from cenproteo import JDC
+  JDC_test =  JDC(<path_to_ppi_file>, <path_to_gene_expression_file>)
+  jdc_sorted_score = JDC_test.calculate_jdc()
+  ```
+  
+* 将结果存储为`.csv`文件：
+  ```python
+  JDC_test.export_result_to_csv(jdc_sorted_score, <path_to_save_result>)
   ```
 
-* 通过classical算法中的NC算法，将得分最高的前100个蛋白与关键蛋白列表进行对比：
-
-  ```shell
-  python main.py --ppi 'SC_Data/processed_data/combined_data.csv' --ess 'SC_Data/processed_data/extracted_essential_protein.csv' --algo classical --method NC --action compare_n --n 100
+* 如果有金标准文件，将算法得到的关键蛋白质与金标准进行比较，输出n个关键蛋白质中预测正确的个数：
+  ```python
+  JDC_test.first_n_comparsion(n, jdc_sorted_score, <path_to_real_essential_protein_file>)
   ```
-
-
 
 ## 📈 Results & Comparison
 
