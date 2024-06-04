@@ -11,7 +11,7 @@ Zhong J, Tang C, Peng W, et al. A novel essential protein identification method 
 """
 
 class JDC:
-    def __init__(self, ppi_file, gene_expression_file,essential_protein_file):
+    def __init__(self, ppi_file, gene_expression_file):
         # Load PPI network data
         self.ppi_file = ppi_file
         try:
@@ -35,17 +35,15 @@ class JDC:
         self.ecc = None
         self.jaccard = None
 
-        self.essential_protein_file = essential_protein_file
-        df_essential = pd.read_csv(essential_protein_file)
-        self.essential_protein_list = self._get_essential_protein(df_essential)
-
         self.sorted_score = self.calculate_jdc()
+
     def _get_essential_protein(self, df):
         essential_pro = []
         for _, row in df.iterrows():
             pro = row.iloc[1]
             essential_pro.append(pro)
         return essential_pro
+    
     def edge_clustering_coefficient(self):
         if self.ecc is not None:
             return self.ecc
@@ -129,13 +127,9 @@ class JDC:
         result_df = pd.DataFrame(self.sorted_jdc, columns=['Protein', 'JDC Centrality Score'])
         result_df.to_csv(save_path, index=False)
 
-    def first_n_comparison(self, n):
-        """
-        Compare the first n elements of the result list.
-        Args:
-            result (list): The list of results.
-
-        """
+    def first_n_comparison(self, n, real_essential_protein_file):
+        df_essential = pd.read_csv(real_essential_protein_file)
+        self.essential_protein_list = self._get_essential_protein(df_essential)
         count = 0
         
         for protein_tuple in self.sorted_jdc[:n]:
@@ -144,13 +138,4 @@ class JDC:
                 count =  count + 1
         print(f"There're {count} essential proteins in the top {n} predicted by algorism.")
         return count
-
-# Example usage
-# ppi_file = r"C:\Users\Administrator\Desktop\CenProteo-main\SC_Data\processed_data\DIP_data_with_combined_scores.csv"
-# gene_expression = r"C:\Users\Administrator\Desktop\CenProteo-main\SC_Data\processed_data\filtered_GE_matrix.csv"
-# essential_protein = r"C:\Users\Administrator\Desktop\CenProteo-main\SC_Data\processed_data\extracted_essential_protein.csv"
-# JDC_test =  JDC(ppi_file,gene_expression,essential_protein)
-# sorted_score = JDC_test.calculate_jdc(5) # to calculate the top n essential protein
-# JDC_test.first_n_comparison(sorted_score)  # compare the essential protein between the result and the ground truth
-
 

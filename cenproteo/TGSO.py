@@ -7,7 +7,7 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(script_dir)
 
 class TGSO:
-    def __init__(self, ppi_file, gene_expression_file, subcellular_localization_file, i_score_file, essential_protein_file, alpha=0.3, max_iter=100, tol=10e-6):
+    def __init__(self, ppi_file, gene_expression_file, subcellular_localization_file, i_score_file, alpha=0.3, max_iter=100, tol=10e-6):
         # load ppi network data
         self.ppi_file = ppi_file
         df_ppi = pd.read_csv(ppi_file)
@@ -29,11 +29,6 @@ class TGSO:
         # Load I_score file
         self.i_score_file = i_score_file
         self.i_score_dict = self._load_i_score(i_score_file)
-
-        # load essential protein data
-        self.essential_protein_file = essential_protein_file
-        df_essential = pd.read_csv(essential_protein_file)
-        self.essential_protein_list = self._get_essential_protein(df_essential)
 
         self.ADN = self.ADN()
         self.CEN = self.CEN()
@@ -288,7 +283,10 @@ class TGSO:
         sorted_protein_score = dict(sorted(P.items(), key=lambda item: item[1], reverse=True))
         return sorted_protein_score, iter_time
     
-    def first_n_comparison(self, n):
+    def first_n_comparison(self, n, real_essential_protein_file):
+        # load essential protein data
+        df_essential = pd.read_csv(real_essential_protein_file)
+        self.essential_protein_list = self._get_essential_protein(df_essential)
         count = 0
         top_TGSO_score = list(self.protein_score.keys())[:n]
         for ess_pro in top_TGSO_score:
@@ -310,13 +308,3 @@ class TGSO:
             for protein, score in sorted(self.protein_score.items(), key=lambda item: item[1], reverse=True):
                 writer.writerow([protein, score])  # Writing each protein and its score
     
-    
-# Example Usage
-# ppi_file = r'SC_Data/processed_data/combined_data.csv'
-# gene_expression_file = r'SC_Data/processed_data/filtered_GE_matrix.csv'
-# subcellular_localization_file = r'SC_Data/processed_data/yeast_compartment_knowledge_full.csv'
-# essential_protein_file = r'SC_Data/processed_data/extracted_essential_protein.csv'
-# i_score_file = r'SC_Data/processed_data/I_score.csv'
-# tgso = TGSO(ppi_file, gene_expression_file, subcellular_localization_file, i_score_file, essential_protein_file)
-# # tgso.first_n_comparison(200)
-# tgso.export_results_to_csv('TGSO_result.csv')

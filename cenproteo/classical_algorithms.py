@@ -2,7 +2,7 @@ import networkx as nx
 import pandas as pd
 
 class classical_algorithms:
-    def __init__(self, ppi_file,essential_protein_file):
+    def __init__(self, ppi_file):
         """
         Initialize the class with a file path to a protein-protein interaction data CSV.
         This method reads the CSV file and constructs a graph using NetworkX.
@@ -17,18 +17,6 @@ class classical_algorithms:
         edges = df.apply(lambda row: (row['Protein A'], row['Protein B']), axis=1).tolist()
         G.add_edges_from(edges)
         self.G = G
-
-        self.essential_protein_file = essential_protein_file
-        df_essential = pd.read_csv(essential_protein_file)
-        self.essential_protein_list = self._get_essential_protein(df_essential)
-
-    def _get_essential_protein(self, df):
-        essential_pro = []
-        for _, row in df.iterrows():
-            pro = row.iloc[1]
-            essential_pro.append(pro)
-        return essential_pro
-    
     
     #find essential protein by computing degree centrality
     def DC(self):
@@ -113,30 +101,35 @@ class classical_algorithms:
         result_df = pd.DataFrame(sorted_result, columns=['Protein', 'Centrality Score'])
         result_df.to_csv(file_name, index=False)
     
-    def first_n_comparison(self, n,result):
+    def _get_essential_protein(self, df):
+        essential_pro = []
+        for _, row in df.iterrows():
+            pro = row.iloc[1]
+            essential_pro.append(pro)
+        return essential_pro
+    
+    def first_n_comparison(self, n, result, real_essential_protein_file):
         """
-        Compare the first n elements of the result list.
+        Compare the first n elements of the result list and real essential protein list.
         Args:
             result (list): The list of results.
+            n: The first n proteins chosen to be compared.
+            real_essential_protein_file: The real essential protein file path.
 
         """
+        df_essential = pd.read_csv(real_essential_protein_file)
+        self.real_essential_protein_list = self._get_essential_protein(df_essential)
+
         count = 0
         
         for protein_tuple in result[:n]:
             protein_name ,score = protein_tuple
-            if protein_name in self.essential_protein_list:
+            if protein_name in self.real_essential_protein_list:
                 count =  count + 1
         print( f"There're {count} essential proteins in the top {n} predicted by algorism.")
         return count
 
-        
-    
-# Example usage
-# ppi_file = r"C:\Users\Administrator\Desktop\CenProteo-main\SC_Data\processed_data\DIP_data_with_combined_scores.csv"
-# essential_protein = r"C:\Users\Administrator\Desktop\CenProteo-main\SC_Data\processed_data\extracted_essential_protein.csv"
-# class_test = classical_algorithms(ppi_file,essential_protein)
-# sorted_score = class_test.DC(5) # Change different method by using different function  -- class_test.NC(N)
-# class_test.first_n_comparison(sorted_score) # compare the essential protein between the result and the ground truth
+
 
 
 

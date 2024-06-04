@@ -7,7 +7,7 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(script_dir)
 
 class TEO:
-    def __init__(self, ppi_file, gene_expression_file, essential_protein_file):
+    def __init__(self, ppi_file, gene_expression_file):
         # load ppi network data
         self.ppi_file = ppi_file
         df_ppi = pd.read_csv(ppi_file)
@@ -24,11 +24,6 @@ class TEO:
         # load GO similarity data
         df_GO = pd.read_csv(ppi_file, index_col = [0, 1])
         self.GO_similarity_dict = self._create_GO_dict(df_GO)
-
-        # load essential protein data
-        self.essential_protein_file = essential_protein_file
-        df_essential = pd.read_csv(essential_protein_file)
-        self.essential_protein_list = self._get_essential_protein(df_essential)
 
         # the result dict using three kinds of GO term
         self.TEO_BP = self.TEO('BP')
@@ -140,7 +135,9 @@ class TEO:
         sorted_TEO_score = dict(sorted(TEO_score.items(), key=lambda item: item[1], reverse=True))
         return sorted_TEO_score
     
-    def first_n_comparison(self, n, GO_term):
+    def first_n_comparison(self, n, GO_term, real_essential_protein_file):
+        df_essential = pd.read_csv(real_essential_protein_file)
+        self.essential_protein_list = self._get_essential_protein(df_essential)
         # Evaluate the efficiency of the algorism by counting how many proteins with high teo score (top n) exist in the essential protein list
         count = 0
         if GO_term == 'BP':
@@ -172,12 +169,3 @@ class TEO:
             for key, value in score_list:
                 writer.writerow([key, value])
 
-
-
-# Example Usage
-# ppi_file = r'SC_Data/processed_data/combined_data.csv'
-# gene_expression_file = r'SC_Data/processed_data/filtered_GE_matrix.csv'
-# essential_protein_file = r'SC_Data/processed_data/extracted_essential_protein.csv'
-# teo = TEO(ppi_file, gene_expression_file, essential_protein_file)
-# # teo.export_results_to_csv('BP', r'TEO_BP_result.csv')
-# teo.first_n_comparison(200, 'BP')
