@@ -217,12 +217,12 @@ pip install -e .
   
 * 将结果存储为`.csv`文件：
   ```python
-  JDC_test.export_result_to_csv(jdc_sorted_score, <path_to_save_result>)
+  JDC_test.export_result_to_csv(<path_to_save_result>)
   ```
 
 * 如果有金标准文件，将算法得到的关键蛋白质与金标准进行比较，输出n个关键蛋白质中预测正确的个数：
   ```python
-  JDC_test.first_n_comparsion(n, jdc_sorted_score, <path_to_real_essential_protein_file>)
+  JDC_test.first_n_comparsion(n, <path_to_real_essential_protein_file>)
   ```
 
 ## 📈 Results & Comparison
