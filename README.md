@@ -200,7 +200,14 @@ pip install -e .
     class_test = classical_algorithms(<path_to_ppi_file>)
     dc_sorted_score = class_test.DC()
     ```
-  
+
+    * `path/to/ppi_file.csv`: PPI 文件的路径，CSV 文件应至少包含前两列，表示蛋白质间的相互作用。例如：
+        ```
+        Protein A,Protein B
+        P1,P2
+        P2,P3
+        ```
+        
 * 将结果存储为 `.csv` 文件：
     ```python
     class_test.export_result_to_csv(dc_sorted_score, <path_to_save_result>)
@@ -219,6 +226,20 @@ pip install -e .
     jdc_test =  JDC(<path_to_ppi_file>, <path_to_gene_expression_file>)
     jdc_sorted_score = jdc_test.calculate_jdc()
     ```
+    
+    * `path/to/ppi_file.csv`: PPI 文件的路径，CSV 文件应至少包含前两列，表示蛋白质间的相互作用。例如：
+        ```
+        protein A,protein B
+        P1,P2
+        P2,P3
+        ```
+    
+    * `path/to/gene_expression_file.csv`: 基因表达文件的路径，CSV 文件应包含多列，第一列为基因ID，后续列为基因在不同样本中的表达水平，最后两列为均值和方差。例如：
+        ```
+        ID_REF,GSM77298,GSM77299,...,mean,std
+        YLR331C,0.055618618,0.073988438,...,0.071587456,0.033760167
+        YLR332W,1.994324565,1.805780292,...,1.81596206,0.816943903
+        ```
   
 * 将结果存储为 `.csv` 文件：
     ```python
