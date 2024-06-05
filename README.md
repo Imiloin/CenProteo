@@ -245,16 +245,15 @@ pip install -e .
       ```
 
 * 将结果存储为 `.csv` 文件：
-    
+  
     ```python
     jdc_test.export_result_to_csv(<path_to_save_result>)
-```
-    
-* 如果有金标准文件，将算法得到的关键蛋白质与金标准进行比较，输出 n 个关键蛋白质中预测正确的个数：
-    ```python
-    jdc_test.first_n_comparsion(n, <path_to_real_essential_protein_file>)
     ```
+* 如果有金标准文件，将算法得到的关键蛋白质与金标准进行比较，输出 n 个关键蛋白质中预测正确的个数：
 
+  ```python
+  jdc_test.first_n_comparsion(n, <path_to_real_essential_protein_file>)
+  ```
 
 #### TEO algorithm
 
