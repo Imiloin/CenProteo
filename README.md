@@ -218,6 +218,14 @@ pip install -e .
     class_test.first_n_comparison(n, dc_sorted_score, <path_to_real_essential_protein_file>)
     ```
 
+    * `path_to_real_essential_protein_file.csv`: 金标准关键蛋白质文件的路径，CSV 文件应至少包含一列，列出关键蛋白质的名称，例如：
+        ```
+        CommonName,SystematicName
+        AAR2,YBL074C
+        ABD1,YBR236C
+        ABF1,YKL112W
+        ```
+
 #### JDC algorithm, TGSO algorithm and TEO algorithm
 以 JDC 模块为例，TGSO 模块和 TEO 模块用法与 JDC 模块相同。
 * 导入 JDC 模块，运用 JDC 算法计算得到排序后网络中所有蛋白质的 JDC 中心性分数：
@@ -250,7 +258,6 @@ pip install -e .
     ```python
     jdc_test.first_n_comparsion(n, <path_to_real_essential_protein_file>)
     ```
-
 
 
 ## 📈 Results & Comparison
