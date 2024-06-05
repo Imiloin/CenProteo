@@ -33,44 +33,44 @@
 
 * 蛋白质互作对及蛋白质 GO 语义相似性数值（The GO similarity value for BP, MF, and CC under the DIP PPI dataset and the combined PPI dataset）：
 
-   基因本体论术语（Gene Ontology term）是生物信息学中用来标准化基因产品属性的一种方式，允许研究人员以一种标准化的方式注释基因和蛋白质的功能，有助于数据的共享和比较。GO 术语覆盖了三个主要领域：分子功能（Molecular Function，MF），细胞组分（Cellular Component，tCC）和生物过程（Biological Process，BP）。
+    基因本体论术语（Gene Ontology term）是生物信息学中用来标准化基因产品属性的一种方式，允许研究人员以一种标准化的方式注释基因和蛋白质的功能，有助于数据的共享和比较。GO 术语覆盖了三个主要领域：分子功能（Molecular Function，MF），细胞组分（Cellular Component，tCC）和生物过程（Biological Process，BP）。
 
-   数据来自文献 [zhang2016topology][1] 支撑材料。
+    数据来自文献 [zhang2016topology][1] 支撑材料。
 
 * 基因表达量数据：
 
-   基因表达量数据是指在特定时间、特定条件或特定细胞类型中，各个基因产生的 RNA 分子数量的测量数据。由于具有一定相似性的蛋白更有可能共表达，可以利用基因表达量数据计算皮尔逊相关系数（PCC），从而表明一对蛋白的相关性强弱。
+    基因表达量数据是指在特定时间、特定条件或特定细胞类型中，各个基因产生的 RNA 分子数量的测量数据。由于具有一定相似性的蛋白更有可能共表达，可以利用基因表达量数据计算皮尔逊相关系数（PCC），从而表明一对蛋白的相关性强弱。
 
-   数据通过文献 [benjamin2005metabolic][2] 提供的数据编号（GSE3431），从 NCBI 中下载相应的基因表达量数据。处理方法如下：
+    数据通过文献 [benjamin2005metabolic][2] 提供的数据编号（GSE3431），从 NCBI 中下载相应的基因表达量数据。处理方法如下：
 
-   * 下载基因表达量原文件，删去数据以外的多余部分，并将数据写入 `.csv` 文件；
-   * 对数据进行过滤，如果该蛋白不存在于酿酒酵母互作蛋白对中，则删去，其余保留；
-   * 通过 GSE3431 数据页面进入测序平台 GPL90 信息页面，下载该基因表达量测定的注释文件，通过脚本将原过滤文件中的通道编号替换为对应的蛋白质编号，如不存在则删去。
+    * 下载基因表达量原文件，删去数据以外的多余部分，并将数据写入 `.csv` 文件；
+    * 对数据进行过滤，如果该蛋白不存在于酿酒酵母互作蛋白对中，则删去，其余保留；
+    * 通过 GSE3431 数据页面进入测序平台 GPL90 信息页面，下载该基因表达量测定的注释文件，通过脚本将原过滤文件中的通道编号替换为对应的蛋白质编号，如不存在则删去。
 
 * 亚细胞定位数据：
 
-   研究表明，很多互作蛋白对都存在与细胞中的同一分区或邻近分区内。因此亚细胞定位数据对于发现关键蛋白有一定帮助。
+    研究表明，很多互作蛋白对都存在与细胞中的同一分区或邻近分区内。因此亚细胞定位数据对于发现关键蛋白有一定帮助。
 
-   数据来自 [COMPARTMENT database](https://compartments.jensenlab.org/Downloads)，选择 `All channels integrated` 中的 `yeast` 选项进行下载。处理方法如下：
+    数据来自 [COMPARTMENT database](https://compartments.jensenlab.org/Downloads)，选择 `All channels integrated` 中的 `yeast` 选项进行下载。处理方法如下：
 
-   * 将原始数据粘贴入 `.csv` 文档；
-   * 通过 11 个亚细胞定位分区所对应的 GO 术语，对数据进行筛选，将符合这 11 个 GO 术语的数据保存到新的 `.csv` 文件，用于后续计算。
+    * 将原始数据粘贴入 `.csv` 文档；
+    * 通过 11 个亚细胞定位分区所对应的 GO 术语，对数据进行筛选，将符合这 11 个 GO 术语的数据保存到新的 `.csv` 文件，用于后续计算。
 
 * 基因同源性数据：
 
-   研究发现，蛋白质的关键程度与其在进化中的保守性有一定关系。如果一个蛋白在多个物种中具有同源蛋白，则该蛋白更有可能为关键蛋白。
+    研究发现，蛋白质的关键程度与其在进化中的保守性有一定关系。如果一个蛋白在多个物种中具有同源蛋白，则该蛋白更有可能为关键蛋白。
 
-   数据来自 [InParanoid database (version 7)](https://inparanoid8.sbc.su.se/download/old_versions/data_7.0/)，选择 `sqltables.tgz` 进行下载，后续处理如下：
+    数据来自 [InParanoid database (version 7)](https://inparanoid8.sbc.su.se/download/old_versions/data_7.0/)，选择 `sqltables.tgz` 进行下载，后续处理如下：
 
-   * 解压文件，利用脚本选择与酿酒酵母有关的数据保存，写入 `.csv` 文件，删去其余文件；
-   * 通过脚本遍历筛选得到的每个文件，筛选同源性 100% 的基因编号保存，并计算每一种同源基因编号在不同物种中出现的次数，计入 `.csv` 文档。
+    * 解压文件，利用脚本选择与酿酒酵母有关的数据保存，写入 `.csv` 文件，删去其余文件；
+    * 通过脚本遍历筛选得到的每个文件，筛选同源性 100% 的基因编号保存，并计算每一种同源基因编号在不同物种中出现的次数，计入 `.csv` 文档。
 
 * 已知关键蛋白表：数据来自 [DEG database](https://tubic.org/deg/public/index.php/query/eukaryotes/degac/DEG2001.html?lineage=eukaryotes&field=degac&term=DEG2001&page=1)，选择 `Download > Eukaryotes > Organisms`，下载 `Saccharomyces cerevisiae` 的关键蛋白信息。数据处理过程如下：
 
-   * 通过 python 脚本，从原文件中提取关键蛋白名称，写入新的 `.csv` 文件；
+    * 通过 python 脚本，从原文件中提取关键蛋白名称，写入新的 `.csv` 文件；
 
-   * 从 [STRING database](https://cn.string-db.org/cgi/input?sessionId=bWGl1KdZES6m&input_page_show_search=on) 中获取两种蛋白质（基因）编码方式的名称对照表，并利用脚本得到对应的蛋白名称，写入 `.csv` 文档；
-   * 利用得到的对应名称，对关键蛋白的名称进行更新（同时包含两种命名模式），便于后续在算法中使用。
+    * 从 [STRING database](https://cn.string-db.org/cgi/input?sessionId=bWGl1KdZES6m&input_page_show_search=on) 中获取两种蛋白质（基因）编码方式的名称对照表，并利用脚本得到对应的蛋白名称，写入 `.csv` 文档；
+    * 利用得到的对应名称，对关键蛋白的名称进行更新（同时包含两种命名模式），便于后续在算法中使用。
 
 
 
@@ -136,9 +136,9 @@
 
 + TGSO algorithm：
 
-    <img src="README.assets/pseudo_code_TGSO.jpg" style="zoom: 100%;" />
+    <img src="README.assets/tgso.jpeg"/>
 
-​    计算流程框架：
+    计算流程框架：
 
     ```mermaid
     flowchart TD
@@ -160,13 +160,13 @@
 
 + JDC algorithm：
 
-    <img src="README.assets/pseudo_code_JDC.jpeg" style="zoom: 50%;" />
+    <img src="README.assets/jdc.jpeg"/>
 
     reference: [zhong2021novel][4]。
 
 + TEO algorithm：
 
-    <img src="README.assets/pseudo_code_TEO.jpg" style="zoom: 45%;" />
+    <img src="README.assets/teo.jpeg" />
 
     reference: [zhang2016topology][1]。
 
@@ -195,39 +195,40 @@ pip install -e .
 
 #### classical algorithms
 * 导入 classical_algorithms 模块，选择算法（这里以 DC 为例）并计算得到排序后网络中所有蛋白质的中心性分数：
-  ```python
-  from cenproteo import classical_algorithms
-  class_test = classical_algorithms(<path_to_ppi_file>)
-  dc_sorted_score = class_test.DC()
-  ```
+    ```python
+    from cenproteo import classical_algorithms
+    class_test = classical_algorithms(<path_to_ppi_file>)
+    dc_sorted_score = class_test.DC()
+    ```
   
 * 将结果存储为 `.csv` 文件：
-  ```python
-  class_test.export_result_to_csv(dc_sorted_score, <path_to_save_result>)
-  ```
+    ```python
+    class_test.export_result_to_csv(dc_sorted_score, <path_to_save_result>)
+    ```
   
 * 如果有金标准文件，将算法得到的关键蛋白质与金标准进行比较，输出n个关键蛋白质中预测正确的个数：
-  ```python
-  class_test.first_n_comparison(n, dc_sorted_score, <path_to_real_essential_protein_file>)
-  ```
+    ```python
+    class_test.first_n_comparison(n, dc_sorted_score, <path_to_real_essential_protein_file>)
+    ```
+
 #### JDC algorithm, TGSO algorithm and TEO algorithm
 以 JDC 模块为例，TGSO 模块和 TEO 模块用法与 JDC 模块相同。
 * 导入 JDC 模块，运用 JDC 算法计算得到排序后网络中所有蛋白质的 JDC 中心性分数：
-  ```python
-  from cenproteo import JDC
-  jdc_test =  JDC(<path_to_ppi_file>, <path_to_gene_expression_file>)
-  jdc_sorted_score = jdc_test.calculate_jdc()
-  ```
+    ```python
+    from cenproteo import JDC
+    jdc_test =  JDC(<path_to_ppi_file>, <path_to_gene_expression_file>)
+    jdc_sorted_score = jdc_test.calculate_jdc()
+    ```
   
 * 将结果存储为 `.csv` 文件：
-  ```python
-  jdc_test.export_result_to_csv(<path_to_save_result>)
-  ```
+    ```python
+    jdc_test.export_result_to_csv(<path_to_save_result>)
+    ```
 
 * 如果有金标准文件，将算法得到的关键蛋白质与金标准进行比较，输出 n 个关键蛋白质中预测正确的个数：
-  ```python
-  jdc_test.first_n_comparsion(n, <path_to_real_essential_protein_file>)
-  ```
+    ```python
+    jdc_test.first_n_comparsion(n, <path_to_real_essential_protein_file>)
+    ```
 
 
 
@@ -247,13 +248,13 @@ pip install -e .
 
 ## 📄 References
 
-[1]  Zhang W, Xu J, Li Y, *et al*. Detecting essential proteins based on network topology, gene expression data, and gene ontology information. *IEEE/ACM transactions on computational biology and bioinformatics*, 2016, 15(1): 109-116. DOI: [10.1186/s12859-021-04175-8](https://doi.org/10.1186/s12859-021-04175-8)
+\[1\]  Zhang W, Xu J, Li Y, *et al*. Detecting essential proteins based on network topology, gene expression data, and gene ontology information. *IEEE/ACM transactions on computational biology and bioinformatics*, 2016, 15(1): 109-116. DOI: [10.1186/s12859-021-04175-8](https://doi.org/10.1186/s12859-021-04175-8)
 
-[2]  Benjamin P. Tu et al. ,Logic of the Yeast Metabolic Cycle: Temporal Compartmentalization of Cellular Processes.Science310,1152-1158(2005). DOI: [10.1126/science.1120499](https://doi.org/10.1126/science.1120499)
+\[2\]  Benjamin P. Tu et al. ,Logic of the Yeast Metabolic Cycle: Temporal Compartmentalization of Cellular Processes.Science310,1152-1158(2005). DOI: [10.1126/science.1120499](https://doi.org/10.1126/science.1120499)
 
-[3]  Li S, Zhang Z, Li X, *et al*. An iteration model for identifying essential proteins by combining comprehensive PPI network with biological information. *BMC bioinformatics*, 2021, 22: 1-25. DOI: [10.1186/s12859-021-04300-7](https://doi.org/10.1186/s12859-021-04300-7)
+\[3\]  Li S, Zhang Z, Li X, *et al*. An iteration model for identifying essential proteins by combining comprehensive PPI network with biological information. *BMC bioinformatics*, 2021, 22: 1-25. DOI: [10.1186/s12859-021-04300-7](https://doi.org/10.1186/s12859-021-04300-7)
 
-[4]  Zhong, J., Tang, C., Peng, W. *et al.* A novel essential protein identification method based on PPI networks and gene expression data. *BMC Bioinformatics* 22, 248 (2021). DOI: [10.1186/s12859-021-04175-8](https://doi.org/10.1186/s12859-021-04175-8)
+\[4\]  Zhong, J., Tang, C., Peng, W. *et al.* A novel essential protein identification method based on PPI networks and gene expression data. *BMC Bioinformatics* 22, 248 (2021). DOI: [10.1186/s12859-021-04175-8](https://doi.org/10.1186/s12859-021-04175-8)
 
 
 
