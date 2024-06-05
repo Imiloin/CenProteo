@@ -9,6 +9,11 @@
 # TEMP
 temp/
 
+# export img
+notebooks/*.svg
+notebooks/*.png
+notebooks/*.jpg
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

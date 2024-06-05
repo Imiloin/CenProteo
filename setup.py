@@ -14,9 +14,10 @@ setup(
     packages=find_packages(),
     python_requires='>=3.8',
     install_requires=[
-        "pytest",
+        "numpy",
         "networkx",
         "pandas",
+        "scipy",
     ],
     classifiers=[
         "Development Status :: 3 - Alpha",

@@ -19,36 +19,29 @@
     <img src="README.assets/asb_network_blue.svg" alt="asb_network_blue" width="200"/>
 </div>
 
-**如何在蛋白质互作网络 (protein-protein interaction netwrok) 中寻找关键蛋白**
+在过去的几十年中，对于单一蛋白质的性质及功能方面的研究取得了很大进展。但是，蛋白质在生物体内很少单独发挥作用，因此了解蛋白质之间的相互作用对于揭示复杂分子机制至关重要。近年来，酵母双杂交系统（Yeast Two-Hybrid, Y2H），交叉链接质谱法（Cross-linking Mass Spectrometry, XL-MS）等高通量实验技术快速发展，使得越来越多蛋白质之间的相互作用被研究和发表，也积累了大量的相关实验数据，由此构建出蛋白质相互作用网络（Protein–Protein Interactions Network, PPIN） 。在 PPIN 中，关键蛋白具有特定的拓扑位置和功能角色，对维持网络的稳定性和功能具有重要影响。为了从 PPIN 中发现关键蛋白，一系列如度中心性（Degree Centrality），介数中心性（Betweenness Centrality），聚类系数（Clustering Coefficient）等图论中的传统算法被应用到 PPIN 中，但这些算法往往忽略了蛋白质的功能作用，仅关注网络拓扑结构。
 
-在过去的几十年中，对于单一蛋白质的性质及功能方面的研究取得了很大进展。但是，蛋白质在生物体内很少单独发挥作用，因此了解蛋白质之间的相互作用对于揭示复杂分子机制至关重要。近年来，酵母双杂交系统（Yeast Two-Hybrid, Y2H），交叉链接质谱法（Cross-linking Mass Spectrometry, XL-MS）等高通量实验技术快速发展，使得越来越多蛋白质之间的相互作用被研究和发表，也积累了大量的相关实验数据，由此构建出蛋白质相互作用网络（PPIN） 。在 PPIN 中，关键蛋白具有特定的拓扑位置和功能角色，对维持网络的稳定性和功能具有重要影响。为了从 PPIN 中发现关键蛋白，出现了一系列如度中心性（Degree Centrality），介数中心性（Betweenness Centrality），聚类系数（Clustering Coefficient）等传统算法。
+近年的一些文献提出了一些新的算法，试图使用更多的生物数据来提高关键蛋白的预测准确性。这些算法包括了基因表达量数据、亚细胞定位数据、基因同源性数据等。使用更多的生物学数据，可以更好地反映蛋白质在生物体内的功能作用，从而提高关键蛋白的预测准确性。
 
-本项目构建了包 `cenproteo` ，实现了几种计算蛋白质网络中蛋白质的中心性，并进行排序从而寻找关键蛋白质的算法。
+本项目构建了包 `cenproteo` ，实现了若干计算蛋白质网络中各蛋白质的中心性并进行排序从而寻找关键蛋白质的算法，验证算法的准确性并进行了效果比对。
 
 
 
 ## 🗂️ Data Source & Preprocessing
 
-在 `cenproteo` python package 中的几种算法中，使用了酿酒酵母（Saccharomyces cerevisiae）的蛋白质互作信息，主要用到了以下几种数据：
+在 `cenproteo` 包实现的几种算法中，使用了酿酒酵母（Saccharomyces cerevisiae）的蛋白质互作信息，主要用到了以下几种数据：
 
 * 蛋白质互作对及蛋白质 GO 语义相似性数值（The GO similarity value for BP, MF, and CC under the DIP PPI dataset and the combined PPI dataset）：
 
    基因本体论术语（Gene Ontology term）是生物信息学中用来标准化基因产品属性的一种方式，允许研究人员以一种标准化的方式注释基因和蛋白质的功能，有助于数据的共享和比较。GO 术语覆盖了三个主要领域：分子功能（Molecular Function，MF），细胞组分（Cellular Component，tCC）和生物过程（Biological Process，BP）。
 
-   数据来自文献 [Zhang W. 2016 Network Topology][1] 支撑材料。
-
-* 已知关键蛋白表：数据来自 [DEG database](https://tubic.org/deg/public/index.php/query/eukaryotes/degac/DEG2001.html?lineage=eukaryotes&field=degac&term=DEG2001&page=1)，选择 `Download > Eukaryotes > Organisms`，下载`Saccharomyces cerevisiae`的关键蛋白信息。数据处理过程如下：
-
-   * 通过 python 脚本，从原文件中提取关键蛋白名称，写入新的 `.csv` 文件；
-
-   * 从 [STRING database](https://cn.string-db.org/cgi/input?sessionId=bWGl1KdZES6m&input_page_show_search=on) 中获取两种蛋白质（基因）编码方式的名称对照表，并利用脚本得到对应的蛋白名称，写入 `.csv` 文档；
-   * 利用得到的对应名称，对关键蛋白的名称进行更新（同时包含两种命名模式），便于后续在算法中使用。
+   数据来自文献 [zhang2016topology][1] 支撑材料。
 
 * 基因表达量数据：
 
-   基因表达量数据是指在特定时间、特定条件或特定细胞类型中，各个基因产生的RNA分子数量的测量数据。由于具有一定相似性的蛋白更有可能共表达，可以利用基因表达量数据计算皮尔逊相关系数（PCC），从而表明一对蛋白的相关性强弱。
+   基因表达量数据是指在特定时间、特定条件或特定细胞类型中，各个基因产生的 RNA 分子数量的测量数据。由于具有一定相似性的蛋白更有可能共表达，可以利用基因表达量数据计算皮尔逊相关系数（PCC），从而表明一对蛋白的相关性强弱。
 
-   数据通过文献 [Benjamin 2005 Metabolic][2] 提供的数据编号（GSE3431），从NCBI中下载相应的基因表达量数据。处理方法如下：
+   数据通过文献 [benjamin2005metabolic][2] 提供的数据编号（GSE3431），从 NCBI 中下载相应的基因表达量数据。处理方法如下：
 
    * 下载基因表达量原文件，删去数据以外的多余部分，并将数据写入 `.csv` 文件；
    * 对数据进行过滤，如果该蛋白不存在于酿酒酵母互作蛋白对中，则删去，其余保留；
@@ -58,7 +51,7 @@
 
    研究表明，很多互作蛋白对都存在与细胞中的同一分区或邻近分区内。因此亚细胞定位数据对于发现关键蛋白有一定帮助。
 
-   数据来自 [COMPARTMENT database](https://compartments.jensenlab.org/Downloads)，选择 `All channels integrated` 中的 `yeast `选项进行下载。处理方法如下：
+   数据来自 [COMPARTMENT database](https://compartments.jensenlab.org/Downloads)，选择 `All channels integrated` 中的 `yeast` 选项进行下载。处理方法如下：
 
    * 将原始数据粘贴入 `.csv` 文档；
    * 通过 11 个亚细胞定位分区所对应的 GO 术语，对数据进行筛选，将符合这 11 个 GO 术语的数据保存到新的 `.csv` 文件，用于后续计算。
@@ -70,7 +63,14 @@
    数据来自 [InParanoid database (version 7)](https://inparanoid8.sbc.su.se/download/old_versions/data_7.0/)，选择 `sqltables.tgz` 进行下载，后续处理如下：
 
    * 解压文件，利用脚本选择与酿酒酵母有关的数据保存，写入 `.csv` 文件，删去其余文件；
-   * 通过脚本遍历筛选得到的每个文件，筛选同源性100%的基因编号保存，并计算每一种同源基因编号在不同物种中出现的次数，计入 `.csv` 文档。
+   * 通过脚本遍历筛选得到的每个文件，筛选同源性 100% 的基因编号保存，并计算每一种同源基因编号在不同物种中出现的次数，计入 `.csv` 文档。
+
+* 已知关键蛋白表：数据来自 [DEG database](https://tubic.org/deg/public/index.php/query/eukaryotes/degac/DEG2001.html?lineage=eukaryotes&field=degac&term=DEG2001&page=1)，选择 `Download > Eukaryotes > Organisms`，下载 `Saccharomyces cerevisiae` 的关键蛋白信息。数据处理过程如下：
+
+   * 通过 python 脚本，从原文件中提取关键蛋白名称，写入新的 `.csv` 文件；
+
+   * 从 [STRING database](https://cn.string-db.org/cgi/input?sessionId=bWGl1KdZES6m&input_page_show_search=on) 中获取两种蛋白质（基因）编码方式的名称对照表，并利用脚本得到对应的蛋白名称，写入 `.csv` 文档；
+   * 利用得到的对应名称，对关键蛋白的名称进行更新（同时包含两种命名模式），便于后续在算法中使用。
 
 
 
@@ -114,7 +114,7 @@
 
     在 `cenproteo` 中，为简化计算，信息中心性通过计算 `curent flow centrality` 来近似。
 
-+ CC（Closeness Centrality）接近中心性：一个节点 $u$的接近中心性 $CC(u)$ 是从节点 $u$ 到网络中所有其他节点的图理论距离之和的倒数。
++ CC（Closeness Centrality）接近中心性：一个节点 $u$ 的接近中心性 $CC(u)$ 是从节点 $u$ 到网络中所有其他节点的图理论距离之和的倒数。
 
     $$CC(u) = \frac{N - 1}{\sum_{v} d(u, v)}$$
 
@@ -136,44 +136,45 @@
 
 + TGSO algorithm：
 
-<img src="README.assets/pseudo_code_TGSO.jpg" style="zoom: 100%;" />
+    <img src="README.assets/pseudo_code_TGSO.jpg" style="zoom: 100%;" />
 
-​		计算流程框架：
+​    计算流程框架：
 
-```mermaid
-   flowchart TD
-         A[Initialize S, lambda, p] --> B[Compute ADN]
-         A --> C[Compute PCC]
-         A --> D[Compute CEN]
-         A --> E[Compute CLN]
-         B --> F[Combine results to compute initial matrix]
-         C --> F
-         D --> F
-         E --> F
-         F --> G[Compute LSG]
-         G --> H[Initialize IS]
-         H --> I[Iterate to find k seeds]
-         I --> J[Update S]
-```
+    ```mermaid
+    flowchart TD
+        A[Initialize S, lambda, p] --> B[Compute ADN]
+        A --> C[Compute PCC]
+        A --> D[Compute CEN]
+        A --> E[Compute CLN]
+        B --> F[Combine results to compute initial matrix]
+        C --> F
+        D --> F
+        E --> F
+        F --> G[Compute LSG]
+        G --> H[Initialize IS]
+        H --> I[Iterate to find k seeds]
+        I --> J[Update S]
+    ```
 
-  reference: Li S, Zhang Z, Li X, *et al*. An iteration model for identifying essential proteins by combining comprehensive PPI network with biological information. *BMC bioinformatics*, 2021, 22: 1-25.https://doi.org/10.1186/s12859-021-04300-7
+    reference: [li2021iteration][3]。
 
 + JDC algorithm：
-  
 
-<img src="README.assets/pseudo_code_JDC.jpeg" style="zoom: 50%;" />
+    <img src="README.assets/pseudo_code_JDC.jpeg" style="zoom: 50%;" />
 
-  reference: Zhong, J., Tang, C., Peng, W. *et al.* A novel essential protein identification method based on PPI networks and gene expression data. *BMC Bioinformatics* 22, 248 (2021). https://doi.org/10.1186/s12859-021-04175-8
+    reference: [zhong2021novel][4]。
 
 + TEO algorithm：
 
-<img src="README.assets/pseudo_code_TEO.jpg" style="zoom: 45%;" />
+    <img src="README.assets/pseudo_code_TEO.jpg" style="zoom: 45%;" />
 
-  reference: Zhang W, Xu J, Li Y, *et al*. Detecting essential proteins based on network topology, gene expression data, and gene ontology information. *IEEE/ACM transactions on computational biology and bioinformatics*, 2016, 15(1): 109-116.https://ieeexplore.ieee.org/document/7586077
+    reference: [zhang2016topology][1]。
 
 
 
 ## 🔧 Installation
+
+本仓库提供了 `cenprotro` 的源代码供安装。
 
 #### Clone this repo
 
@@ -187,6 +188,8 @@ cd CenProteo
 ```bash
 pip install -e .
 ```
+
+
 
 ## ♾️ Usage
 
@@ -212,40 +215,52 @@ pip install -e .
 * 导入 JDC 模块，运用 JDC 算法计算得到排序后网络中所有蛋白质的 JDC 中心性分数：
   ```python
   from cenproteo import JDC
-  JDC_test =  JDC(<path_to_ppi_file>, <path_to_gene_expression_file>)
-  jdc_sorted_score = JDC_test.calculate_jdc()
+  jdc_test =  JDC(<path_to_ppi_file>, <path_to_gene_expression_file>)
+  jdc_sorted_score = jdc_test.calculate_jdc()
   ```
   
 * 将结果存储为 `.csv` 文件：
   ```python
-  JDC_test.export_result_to_csv(<path_to_save_result>)
+  jdc_test.export_result_to_csv(<path_to_save_result>)
   ```
 
 * 如果有金标准文件，将算法得到的关键蛋白质与金标准进行比较，输出 n 个关键蛋白质中预测正确的个数：
   ```python
-  JDC_test.first_n_comparsion(n, <path_to_real_essential_protein_file>)
+  jdc_test.first_n_comparsion(n, <path_to_real_essential_protein_file>)
   ```
+
+
 
 ## 📈 Results & Comparison
 
-将 `cenproteo` python package 中的几种算法进行对比，当选择不同的 n 进行测试时，得分最高的前 n 个蛋白中正确的关键蛋白数量如下：
+将 `cenproteo` 中的几种算法进行对比，选择不同的 n 进行测试时，得分最高的前 n 个蛋白中正确的关键蛋白数量如下：
 
-<img src="README.assets/comparison_fig.jpeg" alt="img"  />
+<img src="README.assets/comparison.svg" alt="img"  />
 
-分别取 N=100，200，400 进行对比：
+分别取 N = 100，200，400 进行对比：
 
-<img src="README.assets/N=100_200_400.jpeg" alt="img" style="zoom:67%;" />
+<img src="README.assets/different_n_counts.svg" alt="img" style="zoom:80%;" />
 
 其中 TGSO 算法的正确性略高于其他算法，且当所选取的 n 值较小时，各算法的准确性相对较高。
 
 
 
-Reference:
+## 📄 References
 
-[1]: Zhang W, Xu J, Li Y, *et al*. Detecting essential proteins based on network topology, gene expression data, and gene ontology information. *IEEE/ACM transactions on computational biology and bioinformatics*, 2016, 15(1): 109-116. 
+[1]  Zhang W, Xu J, Li Y, *et al*. Detecting essential proteins based on network topology, gene expression data, and gene ontology information. *IEEE/ACM transactions on computational biology and bioinformatics*, 2016, 15(1): 109-116. DOI: [10.1186/s12859-021-04175-8](https://doi.org/10.1186/s12859-021-04175-8)
 
-[ Zhang W. 2016 Network Topology ]: https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-021-04175-8
+[2]  Benjamin P. Tu et al. ,Logic of the Yeast Metabolic Cycle: Temporal Compartmentalization of Cellular Processes.Science310,1152-1158(2005). DOI: [10.1126/science.1120499](https://doi.org/10.1126/science.1120499)
 
-[2]: B. P. Tu, A. Kudlicki, M. Rowicka, and S. L. McKnight, “Logic of the yeast metabolic cycle: Temporal compartmentalization of cel- lular processes,” Science, vol. 310, no. 5751, pp. 1152–1158, Nov.2005.
+[3]  Li S, Zhang Z, Li X, *et al*. An iteration model for identifying essential proteins by combining comprehensive PPI network with biological information. *BMC bioinformatics*, 2021, 22: 1-25. DOI: [10.1186/s12859-021-04300-7](https://doi.org/10.1186/s12859-021-04300-7)
 
-[benjamin2005metabolic]: https://www.science.org/doi/10.1126/science.1120499
+[4]  Zhong, J., Tang, C., Peng, W. *et al.* A novel essential protein identification method based on PPI networks and gene expression data. *BMC Bioinformatics* 22, 248 (2021). DOI: [10.1186/s12859-021-04175-8](https://doi.org/10.1186/s12859-021-04175-8)
+
+
+
+[1]: https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-021-04175-8 "zhang2016topology"
+
+[2]: https://doi.org/10.1126/science.1120499 "benjamin2005metabolic"
+
+[3]: https://doi.org/10.1186/s12859-021-04300-7 "li2021iteration"
+
+[4]: https://doi.org/10.1186/s12859-021-04175-8 "zhong2021novel"
