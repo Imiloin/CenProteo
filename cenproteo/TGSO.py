@@ -6,14 +6,26 @@ import csv
 script_dir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(script_dir)
 
+
 class TGSO:
-    def __init__(self, ppi_file, gene_expression_file, subcellular_localization_file, i_score_file, alpha=0.3, max_iter=100, tol=10e-6):
+    def __init__(
+        self,
+        ppi_file,
+        gene_expression_file,
+        subcellular_localization_file,
+        i_score_file,
+        alpha=0.3,
+        max_iter=100,
+        tol=10e-6,
+    ):
         # load ppi network data
         self.ppi_file = ppi_file
         df_ppi = pd.read_csv(ppi_file)
         # construct a PPI netwrok
         G = nx.Graph()
-        edges = df_ppi.apply(lambda row: (row['Protein A'], row['Protein B']), axis=1).tolist()
+        edges = df_ppi.apply(
+            lambda row: (row["Protein A"], row["Protein B"]), axis=1
+        ).tolist()
         G.add_edges_from(edges)
         self.G = G
 
@@ -50,32 +62,27 @@ class TGSO:
             pro = row.iloc[1]
             essential_pro.append(pro)
         return essential_pro
-       
+
     def _create_expression_dict(self, df):
-        '''
+        """
         Construct a dict according to the gene expression data,
         in which the detailed data can be accessed by 'data',
         the average of the expression data by 'mean',
         and the standard deviation by 'std'
-        '''
+        """
         gene_expression_dict = {}
         for index, row in df.iterrows():
             data = row[:-2].tolist()
             mean = row.iloc[-2]
             std = row.iloc[-1]
-            gene_expression_dict[index] = {
-                'data': data,
-                'mean': mean,
-                'std': std
-
-            }
+            gene_expression_dict[index] = {"data": data, "mean": mean, "std": std}
         return gene_expression_dict
-    
+
     def _load_i_score(self, file_path):
         # the oncology score of each protein in 100 different species
         df_i_score = pd.read_csv(file_path, index_col=0)
         df_i_score = df_i_score.dropna()
-        i_score_dict = df_i_score['Oscore'].to_dict()
+        i_score_dict = df_i_score["Oscore"].to_dict()
         return i_score_dict
 
     # construction of protein Aggregation Degree interactive Netwrok
@@ -93,26 +100,32 @@ class TGSO:
                     if conj_pro in NG_protein_b:
                         numerator += 1
                 denominator = min(len(NG_protein_a), len(NG_protein_b))
-                ADN[(protein_a, protein_b)] = numerator/ denominator
+                ADN[(protein_a, protein_b)] = numerator / denominator
         return ADN
-    
+
     def pearson_correlation_coefficient(self, u, v) -> float:
         if (u not in self.gene_expression_dict) or (v not in self.gene_expression_dict):
             return 0.0
-        n = len(self.gene_expression_dict[u]['data'])
-        mean_u, std_u = self.gene_expression_dict[u]['mean'], self.gene_expression_dict[u]['std']
-        mean_v, std_v = self.gene_expression_dict[v]['mean'], self.gene_expression_dict[v]['std']
-        list_u = self.gene_expression_dict[u]['data']
-        list_v = self.gene_expression_dict[v]['data']
+        n = len(self.gene_expression_dict[u]["data"])
+        mean_u, std_u = (
+            self.gene_expression_dict[u]["mean"],
+            self.gene_expression_dict[u]["std"],
+        )
+        mean_v, std_v = (
+            self.gene_expression_dict[v]["mean"],
+            self.gene_expression_dict[v]["std"],
+        )
+        list_u = self.gene_expression_dict[u]["data"]
+        list_v = self.gene_expression_dict[v]["data"]
         pcc = 0
         for i in range(n):
             x_i = list_u[i]
             y_i = list_v[i]
             add = ((x_i - mean_u) / std_u) * ((y_i - mean_v) / std_v)
             pcc += add
-        pcc /= (n - 1)
+        pcc /= n - 1
         return abs(pcc)
-    
+
     # construction of protein co-expression interaction Network
     def CEN(self):
         CEN = {}
@@ -127,44 +140,52 @@ class TGSO:
                 connection = pcc
                 for conj_pro in NG_protein_a:
                     if conj_pro in NG_protein_b:
-                        pcc_1 = self.pearson_correlation_coefficient(protein_a, conj_pro)
-                        pcc_2 = self.pearson_correlation_coefficient(protein_b, conj_pro)
-                        connection += (pcc_1 * pcc_2)
+                        pcc_1 = self.pearson_correlation_coefficient(
+                            protein_a, conj_pro
+                        )
+                        pcc_2 = self.pearson_correlation_coefficient(
+                            protein_b, conj_pro
+                        )
+                        connection += pcc_1 * pcc_2
                 CEN[(protein_a, protein_b)] = connection
         return CEN
-    
+
     # construction of protein Co-Localization interaction Network
     def CLN(self):
-        pro_localization = {} # record the subcellular localizations possessed by each protein
-        sub_pro = {} # record the number of proteins appear in each subcellular localization
+        pro_localization = (
+            {}
+        )  # record the subcellular localizations possessed by each protein
+        sub_pro = (
+            {}
+        )  # record the number of proteins appear in each subcellular localization
         go_terms = {
-            'Nucleus': 'GO:0005634',
-            'Cytosol': 'GO:0005829',
-            'Cytoskeleton': 'GO:0005856',
-            'Peroxisome': 'GO:0005777',
-            'Lysosome': 'GO:0005764',
-            'Endoplasmic Reticulum': 'GO:0005783',
-            'Golgi Apparatus': 'GO:0005794',
-            'Plasma Membrane': 'GO:0005886',
-            'Endosome': 'GO:0005768',
-            'Extracellular Region': 'GO:0005576',
-            'Mitochondrion': 'GO:0005739'
+            "Nucleus": "GO:0005634",
+            "Cytosol": "GO:0005829",
+            "Cytoskeleton": "GO:0005856",
+            "Peroxisome": "GO:0005777",
+            "Lysosome": "GO:0005764",
+            "Endoplasmic Reticulum": "GO:0005783",
+            "Golgi Apparatus": "GO:0005794",
+            "Plasma Membrane": "GO:0005886",
+            "Endosome": "GO:0005768",
+            "Extracellular Region": "GO:0005576",
+            "Mitochondrion": "GO:0005739",
         }
         for index, row in self.df_localization.iterrows():
             protein_name = index
-            go_term = row['GO_term']
+            go_term = row["GO_term"]
             for compartment, term in go_terms.items():
                 if go_term == term:
                     if compartment not in sub_pro:
                         sub_pro[compartment] = []
                     sub_pro[compartment].append(protein_name)
-        
+
         for compartment, pro_list in sub_pro.items():
             for protein in pro_list:
                 if protein not in pro_localization:
                     pro_localization[protein] = []
                 pro_localization[protein].append(compartment)
-        
+
         sub_score = {}
         total_score = 0
         for compartment in sub_pro:
@@ -174,7 +195,7 @@ class TGSO:
 
         for compartment in sub_score:
             sub_score[compartment] /= total_score
-        
+
         # calculate the S_score of each protein
         pro_S_score = {}
         for protein in pro_localization:
@@ -182,7 +203,7 @@ class TGSO:
             for compartment in pro_localization[protein]:
                 S_total += sub_score[compartment]
             pro_S_score[protein] = S_total
-        
+
         # calculate the co-localization score of each protein pair
         colo_sub = {}
         for protein_a in self.G.nodes:
@@ -190,7 +211,7 @@ class TGSO:
                 if (protein_b, protein_a) in colo_sub:
                     colo_sub[(protein_a, protein_b)] = colo_sub[(protein_b, protein_a)]
                     continue
-                
+
                 if protein_a not in pro_localization:
                     localization_a = []
                 else:
@@ -203,7 +224,7 @@ class TGSO:
                 union = list(set(localization_a) | set(localization_b))
                 len_intersection = len(intersection)
                 len_union = len(union)
-                
+
                 if protein_a not in pro_S_score:
                     S_a = 0
                 else:
@@ -215,8 +236,10 @@ class TGSO:
                 if len_union == 0:
                     colo_sub[(protein_a, protein_b)] = 0
                 else:
-                    colo_sub[(protein_a, protein_b)] = (len_intersection / len_union) * (S_a + S_b) / 2
-        
+                    colo_sub[(protein_a, protein_b)] = (
+                        (len_intersection / len_union) * (S_a + S_b) / 2
+                    )
+
         return colo_sub
 
     # construction of a comprehensive interaction between two proteins
@@ -226,33 +249,38 @@ class TGSO:
         for protein_u in self.G.nodes:
             lsg_u = 0
             for protein_v in self.G.neighbors(protein_u):
-                if (protein_u, protein_v) not in self.colo_sub: # no information about the exact localization of the protein
+                if (
+                    protein_u,
+                    protein_v,
+                ) not in self.colo_sub:  # no information about the exact localization of the protein
                     co_sub = 0
                 else:
                     co_sub = self.colo_sub[(protein_u, protein_v)]
-                lsg_uv = self.ADN[(protein_u, protein_v)] * (co_sub + self.CEN[(protein_u, protein_v)])
+                lsg_uv = self.ADN[(protein_u, protein_v)] * (
+                    co_sub + self.CEN[(protein_u, protein_v)]
+                )
                 lsg_u += lsg_uv
             LSG[protein_u] = lsg_u
         return LSG
-    
+
     def _initialize_scores(self):
         # the initial P score should be the P0 score
         P0 = self.i_score_dict.copy()
         return P0
-    
+
     def calculate_P(self):
         LSG = self.LSG()
         P0 = self.P0.copy()
         LSG_total = sum(LSG.values())
-        
+
         P = P0
         iter_time = 0
-        for _ in range(self.max_iter): # avoid too much iteration (error)
+        for _ in range(self.max_iter):  # avoid too much iteration (error)
             P_new = {}
             iter_time += 1
             for protein_i in self.G.nodes:
                 p_i = 0
-                
+
                 a = self.alpha
                 for protein_j in self.G.nodes:
                     # calculate the PCIN score for each two proteins (not necessarily a interaction pair)
@@ -271,18 +299,22 @@ class TGSO:
                     p_j = (1 - a) * PCIN * p2 + a * p0
                     p_i += p_j
                 P_new[protein_i] = p_i
-                
 
             # Check for convergence
-            diff = max(abs(P_new.get(protein, 0) - P.get(protein, 0)) for protein in self.G.nodes)
+            diff = max(
+                abs(P_new.get(protein, 0) - P.get(protein, 0))
+                for protein in self.G.nodes
+            )
             E = len(self.G.edges)
             if (diff / E) < self.tol:
                 break
-            P = P_new # if not converge, update the P dict
+            P = P_new  # if not converge, update the P dict
 
-        sorted_protein_score = dict(sorted(P.items(), key=lambda item: item[1], reverse=True))
+        sorted_protein_score = dict(
+            sorted(P.items(), key=lambda item: item[1], reverse=True)
+        )
         return sorted_protein_score, iter_time
-    
+
     def first_n_comparison(self, n, real_essential_protein_file):
         # load essential protein data
         df_essential = pd.read_csv(real_essential_protein_file)
@@ -292,9 +324,11 @@ class TGSO:
         for ess_pro in top_TGSO_score:
             if ess_pro in self.essential_protein_list:
                 count += 1
-        print( f"There're {count} essential proteins in the top {n} predicted by TGSO algorism. \nThe iteration has been repeated for {self.iter_time} times.")
+        print(
+            f"There're {count} essential proteins in the top {n} predicted by TGSO algorism. \nThe iteration has been repeated for {self.iter_time} times."
+        )
         return count
-    
+
     def export_results_to_csv(self, file_path):
         # Ensure the 'protein_score' dictionary is not empty
         if not self.protein_score:
@@ -302,9 +336,10 @@ class TGSO:
             return
 
         # Open the file and write the headers and data
-        with open(file_path, mode='w', newline='') as file:
+        with open(file_path, mode="w", newline="") as file:
             writer = csv.writer(file)
-            writer.writerow(['Protein', 'Score'])  # Writing header
-            for protein, score in sorted(self.protein_score.items(), key=lambda item: item[1], reverse=True):
+            writer.writerow(["Protein", "Score"])  # Writing header
+            for protein, score in sorted(
+                self.protein_score.items(), key=lambda item: item[1], reverse=True
+            ):
                 writer.writerow([protein, score])  # Writing each protein and its score
-    

@@ -201,7 +201,8 @@ pip install -e .
     dc_sorted_score = class_test.DC()
     ```
 
-    * `path/to/ppi_file.csv`: PPI 文件的路径，CSV 文件应至少包含前两列，表示蛋白质间的相互作用。例如：
+    * `ppi_file.csv`: PPI 文件的路径，CSV 文件应至少包含前两列，表示蛋白质间的相互作用。例如：
+
         ```
         Protein A,Protein B
         P1,P2
@@ -213,12 +214,13 @@ pip install -e .
     class_test.export_result_to_csv(dc_sorted_score, <path_to_save_result>)
     ```
   
-* 如果有金标准文件，将算法得到的关键蛋白质与金标准进行比较，输出n个关键蛋白质中预测正确的个数：
+* 如果有金标准文件，将算法得到的关键蛋白质与金标准进行比较，输出 n 个关键蛋白质中预测正确的个数：
     ```python
     class_test.first_n_comparison(n, dc_sorted_score, <path_to_real_essential_protein_file>)
     ```
 
-    * `path_to_real_essential_protein_file.csv`: 金标准关键蛋白质文件的路径，CSV 文件应至少包含一列，列出关键蛋白质的名称，例如：
+    * `real_essential_protein_file.csv`: 金标准关键蛋白质文件的路径，CSV 文件应至少包含一列，列出关键蛋白质的名称，例如：
+
         ```
         CommonName,SystematicName
         AAR2,YBL074C
@@ -235,14 +237,16 @@ pip install -e .
     jdc_sorted_score = jdc_test.calculate_jdc()
     ```
     
-    * `path/to/ppi_file.csv`: PPI 文件的路径，CSV 文件应至少包含前两列，表示蛋白质间的相互作用。例如：
+    * `ppi_file.csv`: PPI 文件的路径，CSV 文件应至少包含前两列，表示蛋白质间的相互作用。例如：
+
         ```
         protein A,protein B
         P1,P2
         P2,P3
         ```
     
-    * `path/to/gene_expression_file.csv`: 基因表达文件的路径，CSV 文件应包含多列，第一列为基因ID，后续列为基因在不同样本中的表达水平，最后两列为均值和方差。例如：
+    * `gene_expression_file.csv`: 基因表达文件的路径，CSV 文件应包含多列，第一列为基因ID，后续列为基因在不同样本中的表达水平，最后两列为均值和方差。例如：
+
         ```
         ID_REF,GSM77298,GSM77299,...,mean,std
         YLR331C,0.055618618,0.073988438,...,0.071587456,0.033760167
