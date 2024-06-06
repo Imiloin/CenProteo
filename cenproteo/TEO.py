@@ -1,10 +1,6 @@
-import os
 import networkx as nx
 import pandas as pd
 import csv
-
-script_dir = os.path.dirname(os.path.abspath(__file__))
-os.chdir(script_dir)
 
 
 class TEO:

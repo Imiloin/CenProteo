@@ -122,7 +122,6 @@ class classical_algorithms:
             result (list): The list of results.
             n: The first n proteins chosen to be compared.
             real_essential_protein_file: The real essential protein file path.
-
         """
         df_essential = pd.read_csv(real_essential_protein_file)
         self.real_essential_protein_list = self._get_essential_protein(df_essential)
