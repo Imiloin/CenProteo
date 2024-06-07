@@ -53,7 +53,7 @@ class TGSO:
         self.protein_score, self.iter_time = self.calculate_P()
 
     def _get_essential_protein(self, df):
-        essential_pro = []
+        essential_pro = []  # a list to record the essential proteins appear in the file
         for _, row in df.iterrows():
             pro = row.iloc[1]
             essential_pro.append(pro)
@@ -75,18 +75,25 @@ class TGSO:
         return gene_expression_dict
 
     def _load_i_score(self, file_path):
-        # the oncology score of each protein in 100 different species
+        """
+        The oncology score of each protein in 100 different species.
+        the I_score refers to the times each homologous gene appear in different species.
+        """
         df_i_score = pd.read_csv(file_path, index_col=0)
         df_i_score = df_i_score.dropna()
-        i_score_dict = df_i_score["Oscore"].to_dict()
+        i_score_dict = df_i_score["Oscore"].to_dict()  # Oscore = i_score/total i_score
         return i_score_dict
 
     # construction of protein Aggregation Degree interactive Netwrok
     def ADN(self):
         ADN = {}
         for protein_a in self.G.nodes:
-            NG_protein_a = list(self.G.neighbors(protein_a))
-            for protein_b in NG_protein_a:
+            NG_protein_a = list(
+                self.G.neighbors(protein_a)
+            )  # a list for all the neighbors proteins of protein A
+            for (
+                protein_b
+            ) in NG_protein_a:  # traverse all the neighbor proteins of protein A
                 if (protein_b, protein_a) in ADN:
                     ADN[(protein_a, protein_b)] = ADN[(protein_b, protein_a)]
                     continue
@@ -94,12 +101,13 @@ class TGSO:
                 numerator = 1
                 for conj_pro in NG_protein_a:
                     if conj_pro in NG_protein_b:
-                        numerator += 1
+                        numerator += 1  # calculate the number of common neighbors
                 denominator = min(len(NG_protein_a), len(NG_protein_b))
                 ADN[(protein_a, protein_b)] = numerator / denominator
         return ADN
 
     def pearson_correlation_coefficient(self, u, v) -> float:
+        # calculate the pcc value of a protein pair
         if (u not in self.gene_expression_dict) or (v not in self.gene_expression_dict):
             return 0.0
         n = len(self.gene_expression_dict[u]["data"])
@@ -133,9 +141,13 @@ class TGSO:
                     continue
                 pcc = self.pearson_correlation_coefficient(protein_a, protein_b)
                 NG_protein_b = list(self.G.neighbors(protein_b))
-                connection = pcc
+                connection = (
+                    pcc  # calculate the connection value based on the pcc value
+                )
                 for conj_pro in NG_protein_a:
-                    if conj_pro in NG_protein_b:
+                    if (
+                        conj_pro in NG_protein_b
+                    ):  # get the common neighbor of protein A and protein B
                         pcc_1 = self.pearson_correlation_coefficient(
                             protein_a, conj_pro
                         )
@@ -148,6 +160,7 @@ class TGSO:
 
     # construction of protein Co-Localization interaction Network
     def CLN(self):
+        # calculate the colo_sub value according to the protein sublocalization information
         pro_localization = (
             {}
         )  # record the subcellular localizations possessed by each protein
@@ -182,7 +195,9 @@ class TGSO:
                     pro_localization[protein] = []
                 pro_localization[protein].append(compartment)
 
-        sub_score = {}
+        sub_score = (
+            {}
+        )  # calculate the sub_score of each compartment in the go_terms dictionary
         total_score = 0
         for compartment in sub_pro:
             score = len(sub_pro[compartment])
@@ -192,7 +207,7 @@ class TGSO:
         for compartment in sub_score:
             sub_score[compartment] /= total_score
 
-        # calculate the S_score of each protein
+        # calculate the S_score of each protein (the sum of all the sub_score this protein appears in)
         pro_S_score = {}
         for protein in pro_localization:
             S_total = 0
@@ -218,8 +233,12 @@ class TGSO:
                     localization_b = pro_localization[protein_b]
                 intersection = list(set(localization_a) & set(localization_b))
                 union = list(set(localization_a) | set(localization_b))
-                len_intersection = len(intersection)
-                len_union = len(union)
+                len_intersection = len(
+                    intersection
+                )  # the number of the common sublocalization of protein A and B
+                len_union = len(
+                    union
+                )  # the number of union sublocalization of protein A and B
 
                 if protein_a not in pro_S_score:
                     S_a = 0
@@ -312,6 +331,10 @@ class TGSO:
         return sorted_protein_score, iter_time
 
     def first_n_comparison(self, n, real_essential_protein_file):
+        """
+        Compare the first n results in the final outcome with the standard essential protein file.
+        The number given out by the result refers to how many proteins in the top first n is included in the essential protein list.
+        """
         # load essential protein data
         df_essential = pd.read_csv(real_essential_protein_file)
         self.essential_protein_list = self._get_essential_protein(df_essential)
