@@ -1,3 +1,4 @@
+import os
 import networkx as nx
 import pandas as pd
 import csv
@@ -30,9 +31,11 @@ class TEO:
         self.TEO_CC = self.TEO("tCC")
 
     def _get_essential_protein(self, df):
-        essential_pro = []
+        essential_pro = (
+            []
+        )  # a list used to record all the essential proteins appear in the file
         for _, row in df.iterrows():
-            pro = row.iloc[1]
+            pro = row.iloc[1]  # the name of the essential proteins
             essential_pro.append(pro)
         return essential_pro
 
@@ -45,7 +48,9 @@ class TEO:
         """
         GO_dict = {}
         for index, row in df.iterrows():
-            GO_BP = row.iloc[0]
+            GO_BP = row.iloc[
+                0
+            ]  # read the GO term one by one and add them to the dictionary, the key is the protein name
             GO_MF = row.iloc[1]
             GO_CC = row.iloc[2]
             GO_dict[index] = {
@@ -72,14 +77,16 @@ class TEO:
         return gene_expression_dict
 
     def edge_clustering_coefficient(self, u, v):
-        d_u = self.G.degree(u)
+        d_u = self.G.degree(u)  # the degree of a protein
         d_v = self.G.degree(v)
         d_min = min((d_u - 1), (d_v - 1))
 
-        neighbors_u = set(self.G.neighbors(u))
+        neighbors_u = set(
+            self.G.neighbors(u)
+        )  # the neighbors of a protein in a network
         neighbors_v = set(self.G.neighbors(v))
         triangle = 0
-        for neighbor in neighbors_u:
+        for neighbor in neighbors_u:  # find the number of common neighbors
             if neighbor in neighbors_v:
                 triangle += 1
 
@@ -88,6 +95,7 @@ class TEO:
         return (triangle**3) / (d_min)
 
     def pearson_correlation_coefficient(self, u, v):
+        # calculate pcc value of each protein pair
         if (u not in self.gene_expression_dict) or (v not in self.gene_expression_dict):
             return "NA"
         n = len(self.gene_expression_dict[u]["data"])
@@ -104,14 +112,20 @@ class TEO:
         pcc = 0
         for i in range(n):
             x_i = list_u[i]
-            y_i = list_v[i]
+            y_i = list_v[
+                i
+            ]  # x and y refers to the elements in the expression list created above
             add = ((x_i - mean_u) / std_u) * ((y_i - mean_v) / std_v)
             pcc += add
         pcc /= n - 1
         return abs(pcc)
 
     def GO_similarity(self, u, v, GO_term):
-        if GO_term in ["BP", "MF", "tCC"]:
+        if GO_term in [
+            "BP",
+            "MF",
+            "tCC",
+        ]:  # choose the GO value according to the GO term we choose
             go = self.GO_similarity_dict[(u, v)][GO_term]
             return go
         return "GO term error"
@@ -120,7 +134,7 @@ class TEO:
         # calculate the final TEO score of each protein in the PPIN
         if GO_term not in ["BP", "MF", "tCC"]:
             return "GO term error"
-        TEO_score = {}
+        TEO_score = {}  # record the final score of each protein
         for protein_a in self.G.nodes():
             a_TEO = 0
             for protein_b in self.G.neighbors(protein_a):
@@ -129,14 +143,20 @@ class TEO:
                 ECC = self.edge_clustering_coefficient(protein_a, protein_b)
                 GO_sim = self.GO_similarity(protein_a, protein_b, GO_term)
                 PCC = self.pearson_correlation_coefficient(protein_a, protein_b)
-                a_TEO += ECC * (GO_sim + PCC)
+                a_TEO += ECC * (
+                    GO_sim + PCC
+                )  # calculate the TEO score for protein A with every protein it connected to in the network
             TEO_score[protein_a] = a_TEO
         sorted_TEO_score = dict(
             sorted(TEO_score.items(), key=lambda item: item[1], reverse=True)
-        )
+        )  # sort the result
         return sorted_TEO_score
 
     def first_n_comparison(self, n, GO_term, real_essential_protein_file):
+        """
+        Compare the first n results in the final outcome with the standard essential protein file.
+        The number given out by the result refers to how many proteins in the top first n is included in the essential protein list.
+        """
         df_essential = pd.read_csv(real_essential_protein_file)
         self.essential_protein_list = self._get_essential_protein(df_essential)
         # Evaluate the efficiency of the algorism by counting how many proteins with high teo score (top n) exist in the essential protein list
