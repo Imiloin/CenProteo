@@ -208,22 +208,37 @@ pip install -e .
     class_test = classical_algorithms(<path_to_ppi_file>)
     dc_sorted_score = class_test.DC()
     ```
-  
+
+    * `ppi_file.csv`: PPI 文件的路径，CSV 文件应至少包含前两列，表示蛋白质间的相互作用。例如：
+
+        ```csv
+        Protein A,Protein B
+        P1,P2
+        P2,P3
+        ```
+
 * 将结果存储为 `.csv` 文件：
 
     ```python
     class_test.export_result_to_csv(dc_sorted_score, <path_to_save_result>)
     ```
   
-* 如果有金标准文件，将算法得到的关键蛋白质与金标准进行比较，输出n个关键蛋白质中预测正确的个数：
+* 如果有金标准文件，将算法得到的关键蛋白质与金标准进行比较，输出 n 个关键蛋白质中预测正确的个数：
 
     ```python
     class_test.first_n_comparison(n, dc_sorted_score, <path_to_real_essential_protein_file>)
     ```
 
-#### JDC algorithm, TGSO algorithm and TEO algorithm
+    * `real_essential_protein_file.csv`: 金标准关键蛋白质文件的路径，CSV 文件应至少包含一列，列出关键蛋白质的名称，例如：
 
-以 JDC 模块为例，TGSO 模块和 TEO 模块用法与 JDC 模块相同。
+        ```csv
+        CommonName,SystematicName
+        AAR2,YBL074C
+        ABD1,YBR236C
+        ABF1,YKL112W
+        ```
+
+#### JDC algorithm
 
 * 导入 JDC 模块，运用 JDC 算法计算得到排序后网络中所有蛋白质的 JDC 中心性分数：
 
@@ -232,9 +247,17 @@ pip install -e .
     jdc_test =  JDC(<path_to_ppi_file>, <path_to_gene_expression_file>)
     jdc_sorted_score = jdc_test.calculate_jdc()
     ```
-  
-* 将结果存储为 `.csv` 文件：
 
+* `gene_expression_file.csv`: 基因表达文件的路径，CSV 文件应包含多列，第一列为基因ID，后续列为基因在不同样本中的表达水平，最后两列为均值和方差。例如：
+
+    ```csv
+    ID_REF,GSM77298,GSM77299,...,mean,std
+    YLR331C,0.055618618,0.073988438,...,0.071587456,0.033760167
+    YLR332W,1.994324565,1.805780292,...,1.81596206,0.816943903
+    ```
+
+* 将结果存储为 `.csv` 文件：
+  
     ```python
     jdc_test.export_result_to_csv(<path_to_save_result>)
     ```
@@ -243,6 +266,71 @@ pip install -e .
 
     ```python
     jdc_test.first_n_comparsion(n, <path_to_real_essential_protein_file>)
+    ```
+
+#### TEO algorithm
+
+* 导入 TEO 模块，运用 TEO 算法计算得到蛋白互作网络中所有蛋白质关键性得分：
+
+    ```python
+    from cenproteo import TEO
+    teo_test = TEO(<path_to_ppi_file>, <path_to_gene_expression_file>)
+    teo_sorted_score = teo_test.TEO(GO_term)
+    ```
+
+    * `GO_term`: 用于计算蛋白质关键性得分的 GO 术语，可从 `BP` , `MF` , `tCC` 中选择。
+
+* 将结果储存为 `.csv` 文件：
+
+    ```python
+    teo_test.export_results_to_csv(<path_to_save_result>)
+    ```
+
+* 如果有金标准文件，将算法得到的关键蛋白质与金标准进行比较，输出 n 个关键蛋白质中预测正确的个数：
+
+    ```python
+    teo_test.first_n_comparison(n, <path_to_real_essential_protein_file>)
+    ```
+
+#### TGSO algorithm
+
+* 导入 TGSO 模块，运用 TGSO 算法计算得到蛋白互作网络中所有蛋白质关键性得分：
+
+    ```python
+    from cenproteo import TGSO
+    tgso_test = TGSO(<path_to_ppi_file>, <path_to_gene_expression_file>, <path_to_subcellular_localization_file>, <path_to_gene_orthology_file>, alpha, max_iteration_times, tolerance)
+    ```
+
+    * `subcellular_localization_file.csv`: 蛋白质亚细胞定位数据的文件地址，CSV 文件应包含多列，第一列为蛋白质的 systematic name，第二列为蛋白质的 common name，第三列为原始 GO 术语。例如：
+
+        ```csv
+        protein, protein_name, GO_term
+        YFL011W, HXT10, GO:0031224
+        YFL013C, IES1, GO:0032991
+        ```
+
+    * `gene_orthology_file`: 基因同源性文件的地址，CSV 文件应包含三列，第一列为蛋白质名称，第二列为该基因在多个物种中出现同源序列的次数（即 I_score），第三列为该蛋白 I_score 占蛋白互作网络中全部蛋白 I_score 之和的比值（即 O_score）。例如：
+
+        ```csv
+        Protein, I_score, Oscore
+        YHR165C, 93, 0.000512719
+        YDL171C, 62, 0.000341812
+        ```
+
+    * `alpha`: 初始得分的权重系数，默认 alpha=0.3，此时关键蛋白预测效果最佳。
+    * `max_iteration_times`: 最大迭代次数，默认为100.
+    * `tolerance`: 在一轮迭代中，更新的得分与原得分的最大差值，默认为10e-6。
+
+* 将结果储存为 `.csv` 文件：
+
+    ```python
+    tgso_test.export_results_to_csv(<path_to_save_result>)
+    ```
+
+* 如果有金标准文件，将算法得到的关键蛋白质与金标准进行比较，输出 n 个关键蛋白质中预测正确的个数：
+
+    ```python
+    tgso_test.first_n_comparison(n, <path_to_real_essential_protein_file>)
     ```
 
 ## 📈 Results & Comparison
