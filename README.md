@@ -1,5 +1,5 @@
 <h1 align="center">
-    CenProteo: Finding the Essential Proteins in a Protein Interaction Network
+    CenProteo: Finding the Essential Proteins in a Protein-Protein Interaction Network
 </h1>
 <div align="center">
     <p>
@@ -20,15 +20,7 @@
     <img src="README.assets/asb_network_blue.svg" alt="asb_network_blue" width="200"/>
 </div>
 
-在过去的几十年中，对于单一蛋白质的性质及功能方面的研究取得了很大进展。但是，蛋白质在生物体内很少单独发挥作用，
-因此了解蛋白质之间的相互作用对于揭示复杂分子机制至关重要。近年来，酵母双杂交系统（Yeast Two-Hybrid, Y2H），
-交叉链接质谱法（Cross-linking Mass Spectrometry, XL-MS）等高通量实验技术快速发展，
-使得越来越多蛋白质之间的相互作用被研究和发表，也积累了大量的相关实验数据，
-由此构建出蛋白质相互作用网络（Protein–Protein Interactions Network, PPIN）。
-在 PPIN 中，关键蛋白具有特定的拓扑位置和功能角色，对维持网络的稳定性和功能具有重要影响。
-为了从 PPIN 中发现关键蛋白，一系列如度中心性（Degree Centrality），介数中心性（Betweenness Centrality），
-聚类系数（Clustering Coefficient）等图论中的传统算法被应用到 PPIN 中，
-但这些算法往往忽略了蛋白质的功能作用，仅关注网络拓扑结构。
+在过去的几十年中，对于单一蛋白质的性质及功能方面的研究取得了很大进展。但是，蛋白质在生物体内很少单独发挥作用，因此了解蛋白质之间的相互作用对于揭示复杂分子机制至关重要。近年来，酵母双杂交系统（Yeast Two-Hybrid, Y2H），交叉链接质谱法（Cross-linking Mass Spectrometry, XL-MS）等高通量实验技术快速发展，使得越来越多蛋白质之间的相互作用被研究和发表，也积累了大量的相关实验数据，由此构建出蛋白质相互作用网络（Protein–Protein Interactions Network, PPIN）。在 PPIN 中，关键蛋白具有特定的拓扑位置和功能角色，对维持网络的稳定性和功能具有重要影响。为了从 PPIN 中发现关键蛋白，一系列如度中心性（Degree Centrality），介数中心性（Betweenness Centrality），聚类系数（Clustering Coefficient）等图论中的传统算法被应用到 PPIN 中，但这些算法往往忽略了蛋白质的功能作用，仅关注网络拓扑结构。
 
 近年的一些文献提出了一些新的算法，试图使用更多的生物数据来提高关键蛋白的预测准确性。这些算法包括了基因表达量数据、亚细胞定位数据、基因同源性数据等。使用更多的生物学数据，可以更好地反映蛋白质在生物体内的功能作用，从而提高关键蛋白的预测准确性。
 
@@ -45,13 +37,13 @@
     GO 术语覆盖了三个主要领域：分子功能（Molecular Function，MF），
     细胞组分（Cellular Component，tCC）和生物过程（Biological Process，BP）。
 
-    数据来自文献 [\[1\]][1] 支撑材料。
+    数据来自 [\[1\]][1] 支撑材料。
 
 * 基因表达量数据：
 
     基因表达量数据是指在特定时间、特定条件或特定细胞类型中，各个基因产生的 RNA 分子数量的测量数据。由于具有一定相似性的蛋白更有可能共表达，可以利用基因表达量数据计算皮尔逊相关系数（PCC），从而表明一对蛋白的相关性强弱。
 
-    数据通过文献 [\[2\]][2] 提供的数据编号（GSE3431），从 NCBI 中下载相应的基因表达量数据。处理方法如下：
+    数据通过 [\[2\]][2] 提供的数据编号（GSE3431），从 NCBI 中下载相应的基因表达量数据。处理方法如下：
 
     * 下载基因表达量原文件，删去数据以外的多余部分，并将数据写入 `.csv` 文件；
     * 对数据进行过滤，如果该蛋白不存在于酿酒酵母互作蛋白对中，则删去，其余保留；
@@ -318,8 +310,8 @@ pip install -e .
         ```
 
     * `alpha`: 初始得分的权重系数，默认 alpha=0.3，此时关键蛋白预测效果最佳。
-    * `max_iteration_times`: 最大迭代次数，默认为100.
-    * `tolerance`: 在一轮迭代中，更新的得分与原得分的最大差值，默认为10e-6。
+    * `max_iteration_times`: 最大迭代次数，默认为 100.
+    * `tolerance`: 在一轮迭代中，更新的得分与原得分的最大差值，默认为 10e-6。
 
 * 将结果储存为 `.csv` 文件：
 
@@ -335,15 +327,15 @@ pip install -e .
 
 ## 📈 Results & Comparison
 
-将 `cenproteo` 中的几种算法进行对比，选择不同的 n 进行测试时，得分最高的前 n 个蛋白中正确的关键蛋白数量如下：
+将 `cenproteo` 中的几种算法进行对比，分析得分最高的前 N 个蛋白并且与金标准进行比较，各算法正确的关键蛋白数量如下：
 
 <img src="README.assets/comparison.svg" alt="img"  />
 
-分别取 N = 100，200，400 进行对比：
+分别取 N = 100，200，400 进行比较：
 
 <img src="README.assets/different_n_counts.svg" alt="img" style="zoom:80%;" />
 
-其中 TGSO 算法的正确性略高于其他算法，且当所选取的 n 值较小时，各算法的准确性相对较高。
+其中 TGSO 算法的正确性略高于其他算法，且当所选取的 N 值较小时，各算法的准确性相对较高。
 
 ## 📄 References
 
