@@ -138,7 +138,7 @@
 
 * TGSO algorithm：
 
-    <img src="README.assets/tgso.jpeg"  alt="tgso"/>
+    <img src="README.assets/tgso.svg"  alt="tgso"/>
 
     计算流程框架：
 
@@ -162,13 +162,13 @@
 
 * JDC algorithm：
 
-    <img src="README.assets/jdc.jpeg"  alt="jdc"/>
+    <img src="README.assets/jdc.svg"  alt="jdc"/>
 
     reference: [\[4\]][4]。
 
 * TEO algorithm：
 
-    <img src="README.assets/teo.jpeg"  alt="teo"/>
+    <img src="README.assets/teo.svg"  alt="teo"/>
 
     reference: [\[1\]][1]。
 
