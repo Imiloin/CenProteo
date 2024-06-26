@@ -12,7 +12,7 @@ class TGSO:
         i_score_file,
         alpha=0.3,
         max_iter=100,
-        tol=10e-6,
+        tol=1e-5,
     ):
         # load ppi network data
         self.ppi_file = ppi_file

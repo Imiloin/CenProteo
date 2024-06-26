@@ -86,7 +86,7 @@
 
 #### 传统算法
 
-仅使用网络拓扑数据（`cenproteo` 中实现的 `classical algortihms`）计算蛋白质的中心性：
+仅使用网络拓扑数据（`cenproteo` 中实现的 `classical_algorithms`）计算蛋白质的中心性：
 
 * DC（degree centrality）度中心性：一个节点 $u$ 的度中心性 $DC(u)$ 是其连接的边数。
 
@@ -116,7 +116,7 @@
 
     $D$ 为每个节点度的对角矩阵， $C$ 是改进的邻接矩阵， $J$ 是所有元素都为 1 的矩阵。
 
-    在 `cenproteo` 中，为简化计算，信息中心性通过计算 `curent flow centrality` 来近似。
+    在 `cenproteo` 中，为简化计算，信息中心性通过计算 `current flow centrality` 来近似。
 
 * CC（Closeness Centrality）接近中心性：一个节点 $u$ 的接近中心性 $CC(u)$ 是从节点 $u$ 到网络中所有其他节点的图理论距离之和的倒数。
 
@@ -215,7 +215,7 @@ pip install -e .
     class_test.export_result_to_csv(dc_sorted_score, <path_to_save_result>)
     ```
   
-* 如果有金标准文件，将算法得到的关键蛋白质与金标准进行比较，输出 n 个关键蛋白质中预测正确的个数：
+* 如果有金标准文件，将算法得到的关键蛋白质与金标准进行比较，输出前 n 个关键蛋白质中预测正确的个数：
 
     ```python
     class_test.first_n_comparison(n, dc_sorted_score, <path_to_real_essential_protein_file>)
@@ -311,7 +311,7 @@ pip install -e .
 
     * `alpha`: 初始得分的权重系数，默认 alpha=0.3，此时关键蛋白预测效果最佳。
     * `max_iteration_times`: 最大迭代次数，默认为 100.
-    * `tolerance`: 在一轮迭代中，更新的得分与原得分的最大差值，默认为 10e-6。
+    * `tolerance`: 在一轮迭代中，更新的得分与原得分的最大差值，默认为 1e-5。
 
 * 将结果储存为 `.csv` 文件：
 
@@ -341,7 +341,7 @@ pip install -e .
 
 \[1\]  Zhang W, Xu J, Li Y, *et al*. Detecting essential proteins based on network topology, gene expression data, and gene ontology information. *IEEE/ACM transactions on computational biology and bioinformatics*, 2016, 15(1): 109-116. DOI: [10.1186/s12859-021-04175-8](https://doi.org/10.1186/s12859-021-04175-8)
 
-\[2\]  Benjamin P. Tu et al. ,Logic of the Yeast Metabolic Cycle: Temporal Compartmentalization of Cellular Processes.Science310,1152-1158(2005). DOI: [10.1126/science.1120499](https://doi.org/10.1126/science.1120499)
+\[2\]  Benjamin P. Tu, *et al*. Logic of the Yeast Metabolic Cycle: Temporal Compartmentalization of Cellular Processes. *Science* 310, 1152-1158 (2005). DOI: [10.1126/science.1120499](https://doi.org/10.1126/science.1120499)
 
 \[3\]  Li S, Zhang Z, Li X, *et al*. An iteration model for identifying essential proteins by combining comprehensive PPI network with biological information. *BMC bioinformatics*, 2021, 22: 1-25. DOI: [10.1186/s12859-021-04300-7](https://doi.org/10.1186/s12859-021-04300-7)
 
