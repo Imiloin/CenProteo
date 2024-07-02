@@ -14,7 +14,7 @@
     </p>
     <p>
     <a href="https://github.com/Imiloin/CenProteo"><img alt="Github Repository" src="https://img.shields.io/badge/Github-Repository-blue?logo=github&logoColor=blue"></a>
-    <a href="https://github.com/Imiloin/CenProteo?tab=MIT-1-ov-file">
+    <a href="https://github.com/Imiloin/CenProteo?tab=MIT-1-ov-file#readme">
     <img alt="mit" src="https://img.shields.io/badge/License-MIT-red.svg"></a>
     </p>
     <img src="README.assets/asb_network_blue.svg" alt="asb_network_blue" width="200"/>
@@ -32,10 +32,7 @@
 
 * 蛋白质互作对及蛋白质 GO 语义相似性数值（The GO similarity value for BP, MF, and CC under the DIP PPI dataset and the combined PPI dataset）：
 
-    基因本体论术语（Gene Ontology term）是生物信息学中用来标准化基因产品属性的一种方式，
-    允许研究人员以一种标准化的方式注释基因和蛋白质的功能，有助于数据的共享和比较。
-    GO 术语覆盖了三个主要领域：分子功能（Molecular Function，MF），
-    细胞组分（Cellular Component，tCC）和生物过程（Biological Process，BP）。
+    基因本体论术语（Gene Ontology term）是生物信息学中用来标准化基因产品属性的一种方式，允许研究人员以一种标准化的方式注释基因和蛋白质的功能，有助于数据的共享和比较。GO 术语覆盖了三个主要领域：分子功能（Molecular Function，MF），细胞组分（Cellular Component，tCC）和生物过程（Biological Process，BP）。
 
     数据来自 [\[1\]][1] 支撑材料。
 
@@ -186,6 +183,7 @@ cd CenProteo
 #### Setup
 
 ```bash
+# python >= 3.8 required
 pip install -e .
 ```
 
@@ -290,7 +288,15 @@ pip install -e .
 
     ```python
     from cenproteo import TGSO
-    tgso_test = TGSO(<path_to_ppi_file>, <path_to_gene_expression_file>, <path_to_subcellular_localization_file>, <path_to_gene_orthology_file>, alpha, max_iteration_times, tolerance)
+    tgso_test = TGSO(
+        <path_to_ppi_file>,
+        <path_to_gene_expression_file>,
+        <path_to_subcellular_localization_file>,
+        <path_to_gene_orthology_file>,
+        alpha,
+        max_iteration_times,
+        tolerance
+    )
     ```
 
     * `subcellular_localization_file.csv`: 蛋白质亚细胞定位数据的文件地址，CSV 文件应包含多列，第一列为蛋白质的 systematic name，第二列为蛋白质的 common name，第三列为原始 GO 术语。例如：
@@ -310,7 +316,7 @@ pip install -e .
         ```
 
     * `alpha`: 初始得分的权重系数，默认 alpha=0.3，此时关键蛋白预测效果最佳。
-    * `max_iteration_times`: 最大迭代次数，默认为 100.
+    * `max_iteration_times`: 最大迭代次数，默认为 100。
     * `tolerance`: 在一轮迭代中，更新的得分与原得分的最大差值，默认为 1e-5。
 
 * 将结果储存为 `.csv` 文件：
@@ -329,23 +335,23 @@ pip install -e .
 
 将 `cenproteo` 中的几种算法进行对比，分析得分最高的前 N 个蛋白并且与金标准进行比较，各算法正确的关键蛋白数量如下：
 
-<img src="README.assets/comparison.svg" alt="img"  />
+<img src="README.assets/comparison.svg" alt="img"/>
 
 分别取 N = 100，200，400 进行比较：
 
-<img src="README.assets/different_n_counts.svg" alt="img" style="zoom:80%;" />
+<img src="README.assets/different_n_counts.svg" alt="img" style="zoom:80%;"/>
 
 其中 TGSO 算法的正确性略高于其他算法，且当所选取的 N 值较小时，各算法的准确性相对较高。
 
 ## 📄 References
 
-\[1\]  Zhang W, Xu J, Li Y, *et al*. Detecting essential proteins based on network topology, gene expression data, and gene ontology information. *IEEE/ACM transactions on computational biology and bioinformatics*, 2016, 15(1): 109-116. DOI: [10.1186/s12859-021-04175-8](https://doi.org/10.1186/s12859-021-04175-8)
+\[1\]  Zhang W, Xu J, Li Y, *et al*. Detecting essential proteins based on network topology, gene expression data, and gene ontology information. *IEEE/ACM transactions on computational biology and bioinformatics*, 2016, 15(1): 109-116. DOI: [10.1186/s12859-021-04175-8](https://doi.org/10.1186/s12859-021-04175-8).
 
-\[2\]  Benjamin P. Tu, *et al*. Logic of the Yeast Metabolic Cycle: Temporal Compartmentalization of Cellular Processes. *Science* 310, 1152-1158 (2005). DOI: [10.1126/science.1120499](https://doi.org/10.1126/science.1120499)
+\[2\]  Benjamin P. Tu, *et al*. Logic of the Yeast Metabolic Cycle: Temporal Compartmentalization of Cellular Processes. *Science* 310, 1152-1158 (2005). DOI: [10.1126/science.1120499](https://doi.org/10.1126/science.1120499).
 
-\[3\]  Li S, Zhang Z, Li X, *et al*. An iteration model for identifying essential proteins by combining comprehensive PPI network with biological information. *BMC bioinformatics*, 2021, 22: 1-25. DOI: [10.1186/s12859-021-04300-7](https://doi.org/10.1186/s12859-021-04300-7)
+\[3\]  Li S, Zhang Z, Li X, *et al*. An iteration model for identifying essential proteins by combining comprehensive PPI network with biological information. *BMC bioinformatics*, 2021, 22: 1-25. DOI: [10.1186/s12859-021-04300-7](https://doi.org/10.1186/s12859-021-04300-7).
 
-\[4\]  Zhong, J., Tang, C., Peng, W. *et al.* A novel essential protein identification method based on PPI networks and gene expression data. *BMC Bioinformatics* 22, 248 (2021). DOI: [10.1186/s12859-021-04175-8](https://doi.org/10.1186/s12859-021-04175-8)
+\[4\]  Zhong, J., Tang, C., Peng, W. *et al.* A novel essential protein identification method based on PPI networks and gene expression data. *BMC Bioinformatics* 22, 248 (2021). DOI: [10.1186/s12859-021-04175-8](https://doi.org/10.1186/s12859-021-04175-8).
 
 [1]: https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-021-04175-8 "zhang2016topology"
 
