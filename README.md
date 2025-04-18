@@ -16,6 +16,7 @@
     <a href="https://github.com/Imiloin/CenProteo">
       <img alt="Github Repository" src="https://img.shields.io/badge/Github-Repository-blue?logo=github&logoColor=blue">
     </a>
+    &nbsp;
     <a href="https://github.com/Imiloin/CenProteo?tab=MIT-1-ov-file#readme">
       <img alt="mit" src="https://img.shields.io/badge/License-MIT-red.svg">
     </a>
@@ -89,61 +90,49 @@
 
 * DC（degree centrality）度中心性：一个节点 $u$ 的度中心性 $DC(u)$ 是其连接的边数。
 
-  $$
-  DC(u) = \sum_{v} a_{u,v}
-  $$
+  $$DC(u) = \sum_{v} a_{u,v}$$
 
 * BC（Betweenness Centrality）介数中心性：一个节点 $u$ 的介数中心性 $BC(u)$ 定义为通过节点 $u$ 的最短路径的平均比例。
 
-  $$
-  BC(u) = \sum_{s} \sum_{t} \frac{\rho(s, u, t)}{\rho(s, t)}, \quad s \neq t \neq u
-  $$
+  $$BC(u) = \sum_{s} \sum_{t} \frac{\rho(s, u, t)}{\rho(s, t)}, \quad s \neq t \neq u$$
 
-  $\rho(s, t)$ 指的是 $s$ 和 $t$ 之间的最短路径数目，$\rho(s, u, t)$ 指的是 $s$ 和 $t$ 之间的最短路径中经过 $u$ 的数目。
+  $\rho(s, t)$ 指的是 $s$ 和 $t$ 之间的最短路径数目， $\rho(s, u, t)$ 指的是 $s$ 和 $t$ 之间的最短路径中经过 $u$ 的数目。
 
 * EC（Eigenvector Centrality）特征向量中心性：一个节点 $u$ 的特征向量中心性 $EC(u)$ 定义为 $A$ 的主特征向量的第 $u$ 分量。
 
-  $$
-  EC(u) = \alpha_{\max}(u)
-  $$
+  $$EC(u) = \alpha_{\max}(u)$$
 
   $\alpha_{\max}$ 指的是 $A$ 的最大值对应的特征向量， $\alpha_{\max}(u)$ 指的是 $\alpha_{\max}$ 的第 $u$ 个分量。
 
 * SC（Subgraph Centrality）子图中心性：一个节点 $u$ 的子图中心性 $SC(u)$ 衡量的是节点 $u$ 参与的整个网络中子图的数量。
 
-  $$
-  SC(u) = \sum_{l=0}^{\infty} \frac{\mu_{l}(u)}{l!}
-  $$
+  $$SC(u) = \sum_{l=0}^{\infty} \frac{\mu_{l}(u)}{l!}$$
 
   $\mu_{l}(u)$ 指的是开始并结束于节点 $u$ 且长度为 $l$ 的环路数目。
 
 * IC（Information Centrality）信息中心性：一个节点 $u$ 的信息中心性 $IC(u)$ 衡量的是以节点 $u$ 结束的路径长度的调和平均值。
 
-  $$
-  IC(u) = \left[\frac{1}{N} \sum_{v} \frac{1}{I_{uv}}\right]^{-1},I_{uv} = (c_{uu} + c_{vv} - c_{uv})^{-1},C = (c_{uv}) = [D - A + J]^{-1}
-  $$
+  $$IC(u) = \left[\frac{1}{N} \sum_{v} \frac{1}{I_{uv}}\right]^{-1},I_{uv} = (c_{uu} + c_{vv} - c_{uv})^{-1},C = (c_{uv}) = [D - A + J]^{-1}$$
 
-  $D$ 为每个节点度的对角矩阵，$C$ 是改进的邻接矩阵，$J$ 是所有元素都为 1 的矩阵。
+  $D$ 为每个节点度的对角矩阵， $C$ 是改进的邻接矩阵， $J$ 是所有元素都为 1 的矩阵。
 
   在 `cenproteo` 中，为简化计算，信息中心性通过计算 `current flow centrality` 来近似。
 
 * CC（Closeness Centrality）接近中心性：一个节点 $u$ 的接近中心性 $CC(u)$ 是从节点 $u$ 到网络中所有其他节点的图理论距离之和的倒数。
 
-  $$
-  CC(u) = \frac{N - 1}{\sum_{v} d(u, v)}
-  $$
+  $$CC(u) = \frac{N - 1}{\sum_{v} d(u, v)}$$
 
   $d(u,v)$ 指的是从节点 $u$ 到结点 $n$ 的距离。
 
 * NC（Neighbor Centrality）邻居中心性：节点 $u$ 的邻域中心性 $NC(u)$ 定义为节点 $u$ 邻居之间的边聚类系数（Edge Clustering Coefficient, ECC）之和。
 
-  $$
-  \begin{aligned}
-    NC(u) &= \sum_{v \in N_u} ECC(u, v) \\
-    ECC(u, v) &= \frac{z_{u, v}}{\min(d_u - 1, d_v - 1)} \\
-    z_{u, v} &= \sum_{w} A_{uw} A_{vw}
-  \end{aligned}
-  $$
+$$
+\begin{aligned}
+NC(u) &= \sum_{v \in N_u} ECC(u, v) \\
+ECC(u, v) &= \frac{z_{u, v}}{\min(d_u - 1, d_v - 1)} \\
+z_{u, v} &= \sum_{w} A_{uw} A_{vw}
+\end{aligned}
+$$
 
   边聚类系数 $ECC(u, v)$ 表示节点 $u$ 和节点 $v$ 之间的共同邻居数 $z_{u, v}$ 与两者度数的最小值之比， $A_{uw}$ 和 $A_{vw}$ 分别表示节点 $u$ 和 $v$ 是否与节点 $w$ 相连。
 
@@ -427,7 +416,7 @@ pip install -e .
 
 分别取 N = 100，200，400 进行比较：
 
-<img src="README.assets/different_n_counts.svg" alt="different_n_counts" width="400px"/>
+<img src="README.assets/different_n_counts.svg" alt="different_n_counts" width="600px"/>
 
 其中 TGSO 算法的正确性略高于其他算法，且当所选取的 N 值较小时，各算法的准确性相对较高。
 
