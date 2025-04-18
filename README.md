@@ -345,7 +345,7 @@ pip install -e .
 
 ## 📄 References
 
-\[1\]  Zhang W, Xu J, Li Y, *et al*. Detecting essential proteins based on network topology, gene expression data, and gene ontology information. *IEEE/ACM transactions on computational biology and bioinformatics*, 2016, 15(1): 109-116. DOI: [10.1186/s12859-021-04175-8](https://doi.org/10.1186/s12859-021-04175-8).
+\[1\]  Zhang W, Xu J, Li Y, *et al*. Detecting essential proteins based on network topology, gene expression data, and gene ontology information. *IEEE/ACM transactions on computational biology and bioinformatics*, 2016, 15(1): 109-116. DOI: [10.1109/TCBB.2016.2615931](https://doi.org/10.1109/tcbb.2016.2615931).
 
 \[2\]  Benjamin P. Tu, *et al*. Logic of the Yeast Metabolic Cycle: Temporal Compartmentalization of Cellular Processes. *Science* 310, 1152-1158 (2005). DOI: [10.1126/science.1120499](https://doi.org/10.1126/science.1120499).
 
@@ -353,7 +353,7 @@ pip install -e .
 
 \[4\]  Zhong, J., Tang, C., Peng, W. *et al.* A novel essential protein identification method based on PPI networks and gene expression data. *BMC Bioinformatics* 22, 248 (2021). DOI: [10.1186/s12859-021-04175-8](https://doi.org/10.1186/s12859-021-04175-8).
 
-[1]: https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-021-04175-8 "zhang2016topology"
+[1]: https://doi.org/10.1109/tcbb.2016.2615931 "zhang2016topology"
 
 [2]: https://doi.org/10.1126/science.1120499 "benjamin2005metabolic"
 
