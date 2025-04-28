@@ -12,7 +12,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="cenproteo",
-    version="0.1.0",
+    version="0.2.0",
     author="Imiloin, Cannizzaro-reaction, xywawawa",
     url="https://github.com/Imiloin/CenProteo",
     license="MIT",

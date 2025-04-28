@@ -8,8 +8,9 @@
 
 # TEMP
 temp/
+.github/copilot-instructions.md
 
-# export img
+# exported img
 notebooks/*.svg
 notebooks/*.png
 notebooks/*.jpg
